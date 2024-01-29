@@ -1,7 +1,7 @@
 package com.gamza.ItEat.entity;
 
-import com.gamza.EatIt.enums.Tag;
-import com.gamza.EatIt.enums.UserRole;
+import com.gamza.ItEat.enums.Tag;
+import com.gamza.ItEat.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,11 +23,9 @@ public class UserEntity {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    //@Size(min = 3, max = 20)
     private String userEmail;
 
     @Column(nullable = false)
-    //추후 수정
     private String password;
 
     @Column(nullable = false, unique = true)
