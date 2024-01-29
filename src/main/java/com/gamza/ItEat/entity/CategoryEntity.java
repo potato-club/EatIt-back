@@ -1,7 +1,6 @@
 package com.gamza.ItEat.entity;
 
-//import Gamaza.takeit.enums.CategoryName;
-import com.gamza.EatIt.enums.CategoryName;
+import com.gamza.ItEat.enums.CategoryName;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
