@@ -74,22 +74,5 @@ public class UserService {
 
         return ResponseEntity.ok("로그인 성공");
     }
-/*    public ResponseEntity<String> refreshAccessToken(HttpServletRequest request, HttpServletResponse response) {
-        String RT = jwtProvider.resolveRefreshToken(request);
 
-        if ( !jwtProvider.validateToken(RT) ) {
-            throw new UnAuthorizedException(ErrorCode.INVALID_TOKEN_EXCEPTION.getMessage(), ErrorCode.INVALID_TOKEN_EXCEPTION);
-        }
-
-        UserEntity userEntity = userRepository
-                .findByEmail(jwtProvider.getUserEmail(RT))
-                .orElseThrow(()->{throw new NotFoundException(ErrorCode.NOT_FOUND_EXCEPTION.getMessage(), ErrorCode.NOT_FOUND_EXCEPTION);});
-
-        if ( !(RT.equals(userEntity.getRefreshToken())) ) {
-            throw new UnAuthorizedException("저장된 RT와 다릅니다.",ErrorCode.INVALID_TOKEN_EXCEPTION);
-        }
-
-        response.setHeader("Authorization","Bearer " + jwtProvider.createAccessToken(userEntity));
-        return ResponseEntity.ok("good,check header");
-    }*/
 }

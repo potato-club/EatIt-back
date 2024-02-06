@@ -34,10 +34,6 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    private final JwtAuthorizationTokenFilter jwtAuthorizationTokenFilter;
-    private final CustomUserDetailService customUserDetailService;
-    //private final WebAccessDeniedHandler webAccessDeniedHandler;
-
     private final RedisService redisService;
     private final JwtProvider jwtTokenProvider;
 
