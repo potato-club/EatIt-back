@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -58,10 +57,10 @@ public class UserService {
 
     public ResponseEntity<String> login(LoginRequestDto loginRequestDto, HttpServletResponse response){
         UserEntity userEntity = userRepository.findByEmail(loginRequestDto.getEmail())
-                .orElseThrow(()-> new UnAuthorizedException(ErrorCode.INVALID_TOKEN_EXCEPTION.getMessage(), ErrorCode.INVALID_TOKEN_EXCEPTION));
+                .orElseThrow(()-> new UnAuthorizedException(ErrorCode.INVALID_ACCESS.getMessage(), ErrorCode.INVALID_ACCESS));
 
         if ( !passwordEncoder.matches(loginRequestDto.getPassword(),userEntity.getPassword()) ) {
-            throw new UnAuthorizedException(ErrorCode.INVALID_TOKEN_EXCEPTION.getMessage(),ErrorCode.INVALID_TOKEN_EXCEPTION);
+            throw new UnAuthorizedException(ErrorCode.INVALID_ACCESS.getMessage(),ErrorCode.INVALID_ACCESS);
         }
 
         String AT = jwtProvider.createAccessToken(userEntity.getEmail(), userEntity.getUserRole());
@@ -75,4 +74,5 @@ public class UserService {
         return ResponseEntity.ok("로그인 성공");
     }
 
+}
 }

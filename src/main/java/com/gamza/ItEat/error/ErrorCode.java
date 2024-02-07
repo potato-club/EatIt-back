@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
     RUNTIME_EXCEPTION(HttpStatus.BAD_REQUEST, "400", "400 Bad Request"),
     ACCESS_DENIED_EXCEPTION(HttpStatus.UNAUTHORIZED, "401", "401 UnAuthorized"),
+    INVALID_ACCESS(HttpStatus.UNAUTHORIZED, "401","401 Authentication error occurred"),
+
     NOT_ALLOW_WRITE_EXCEPTION(HttpStatus.UNAUTHORIZED, "401_NOT_ALLOW", "401 UnAuthorized"),
     FORBIDDEN_EXCEPTION(HttpStatus.FORBIDDEN, "403", "403 Forbidden"),
     NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "404", "404 Not Found"),
