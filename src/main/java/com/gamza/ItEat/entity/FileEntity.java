@@ -28,9 +28,7 @@ public class FileEntity extends BaseTime {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private PostEntity post;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private UserEntity user;
-
-
 }
