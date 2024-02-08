@@ -48,7 +48,6 @@ public class PostEntity extends BaseTime {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<FileEntity> images = new ArrayList<>();
 
-    @ElementCollection
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private List<Tag> tags;
