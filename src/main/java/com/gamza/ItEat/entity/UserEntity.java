@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
 
 import java.util.List;
 
@@ -15,6 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@DynamicInsert
 public class UserEntity {
 
     @Id
@@ -23,16 +25,19 @@ public class UserEntity {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String userEmail;
+    private String email;
 
     @Column(nullable = false)
     private String password;
 
     @Column(nullable = false, unique = true)
-    private String nickname;
+    private String nickName;
 
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
+
+    @Column(nullable = false)
+    private String refreshToken;
 
     @Column
     private String profile;
@@ -41,8 +46,11 @@ public class UserEntity {
     @JoinColumn(name = "post_id")
     private PostEntity posts;
 
-    @ElementCollection
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private List<Tag> tags;
+
+    public void setRefreshToken(String RT) {
+        this.refreshToken = RT;
+    }
 }

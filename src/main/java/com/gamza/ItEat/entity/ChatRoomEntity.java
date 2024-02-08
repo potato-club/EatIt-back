@@ -1,15 +1,12 @@
 package com.gamza.ItEat.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
+@Getter
 @Entity
 @NoArgsConstructor
 @Builder
@@ -25,7 +22,7 @@ public class ChatRoomEntity extends BaseTime {
     private UserEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id") // 이거 그냥 나중에 바꿔야할거같은데
+    @JoinColumn(name = "post_id")
     private PostEntity post;
 
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
