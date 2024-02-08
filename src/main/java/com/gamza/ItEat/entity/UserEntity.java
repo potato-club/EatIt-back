@@ -46,6 +46,7 @@ public class UserEntity {
     @JoinColumn(name = "post_id")
     private PostEntity posts;
 
+    @ElementCollection(targetClass = Tag.class)
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private List<Tag> tags;
