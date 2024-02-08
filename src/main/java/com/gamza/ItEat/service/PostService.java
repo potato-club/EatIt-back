@@ -5,10 +5,14 @@ import com.gamza.ItEat.dto.post.RequestUpdatePostDto;
 import com.gamza.ItEat.dto.post.ResponsePostDto;
 import com.gamza.ItEat.dto.post.ResponsePostListDto;
 import com.gamza.ItEat.entity.PostEntity;
+import com.gamza.ItEat.entity.UserEntity;
+import com.gamza.ItEat.enums.UserRole;
 import com.gamza.ItEat.error.ErrorCode;
 import com.gamza.ItEat.error.exeption.BadRequestException;
+import com.gamza.ItEat.error.exeption.UnAuthorizedException;
 import com.gamza.ItEat.repository.PostRepository;
 import com.gamza.ItEat.utils.ResponseValue;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +28,7 @@ import java.util.stream.Collectors;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final UserService userService;
 
     public ResponsePostListDto findAllPost() {
 
@@ -48,33 +53,51 @@ public class PostService {
         }
     }
 
-    public Long createPost(RequestPostDto requestDto) {
-        PostEntity post = PostEntity.builder()
-                .title(requestDto.getTitle())
-                .content(requestDto.getContent())
-                .build();
-        PostEntity savedPost = postRepository.save(post); // 게시물 저장하고
+    public Long createPost(RequestPostDto requestDto, HttpServletRequest request) {
 
-        return savedPost.getId(); // 게시물 id값 반환
+        UserEntity userEntity = userService.findByUserToken(request);
+        if (userEntity.getUserRole() != UserRole.USER) {
+            throw new UnAuthorizedException("유저 권한이 없습니다.", ErrorCode.ACCESS_DENIED_EXCEPTION);
+        } else {
+
+            PostEntity post = PostEntity.builder()
+                    .title(requestDto.getTitle())
+                    .content(requestDto.getContent())
+                    .build();
+            PostEntity savedPost = postRepository.save(post); // 게시물 저장하고
+
+            return savedPost.getId(); // 게시물 id값 반환
+        }
     }
 
-    public Long updatePost(RequestUpdatePostDto updatePostDto, Long id) {
-        PostEntity originPost = postRepository.findById(id).
-                orElseThrow(() -> new BadRequestException("게시물이 존재하지 않습니다.", ErrorCode.RUNTIME_EXCEPTION)); // 오류 출력 게시물 없을떄 따로하나 만들어야겠다.
+    public Long updatePost(RequestUpdatePostDto updatePostDto, Long id, HttpServletRequest request) {
+        UserEntity userEntity = userService.findByUserToken(request);
 
-        String updatedTitle = updatePostDto.getTitle();
-        String updatedContent = updatePostDto.getContent();
+        if (userEntity.getUserRole() != UserRole.USER) {
+            throw new UnAuthorizedException("유저 권한이 없습니다.", ErrorCode.ACCESS_DENIED_EXCEPTION);
+        } else {
+            PostEntity originPost = postRepository.findById(id).
+                    orElseThrow(() -> new BadRequestException("게시물이 존재하지 않습니다.", ErrorCode.RUNTIME_EXCEPTION)); // 오류 출력 게시물 없을떄 따로하나 만들어야겠다.
 
-        originPost.updatePost(updatedTitle, updatedContent);
-        return postRepository.save(originPost).getId();
+            String updatedTitle = updatePostDto.getTitle();
+            String updatedContent = updatePostDto.getContent();
+
+            originPost.updatePost(updatedTitle, updatedContent);
+            return postRepository.save(originPost).getId();
+        }
     }
 
-    public void deletePost(Long id) {
+    public void deletePost(Long id, HttpServletRequest request) {
+        UserEntity userEntity = userService.findByUserToken(request);
 
-        PostEntity originPost = postRepository.findById(id).
-                orElseThrow(() -> new BadRequestException("게시물이 존재하지 않습니다.",ErrorCode.RUNTIME_EXCEPTION));
+        if (userEntity.getUserRole() != UserRole.USER) {
+            throw new UnAuthorizedException("유저 권한이 없습니다.", ErrorCode.ACCESS_DENIED_EXCEPTION);
+        } else {
+            PostEntity originPost = postRepository.findById(id).
+                    orElseThrow(() -> new BadRequestException("게시물이 존재하지 않습니다.", ErrorCode.RUNTIME_EXCEPTION));
 
-        postRepository.deleteById(id);
+            postRepository.deleteById(id);
+        }
     }
 
 

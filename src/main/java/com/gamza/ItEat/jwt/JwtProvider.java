@@ -49,16 +49,17 @@ public class JwtProvider {
     }
 
     public String createAccessToken(String userEmail, UserRole userRole) {
-        return this.createToken(userEmail, userRole, accessTokenValidTime);
+        return this.createToken(userEmail, userRole, accessTokenValidTime, "access");
     }
 
     public String createRefreshToken(String userEmail, UserRole userRole) {
-        return this.createToken(userEmail, userRole, refreshTokenValidTime);
+        return this.createToken(userEmail, userRole, refreshTokenValidTime, "refresh");
     }
 
-    public String createToken(String userEmail, UserRole userRole, long tokenValid) {
+    public String createToken(String userEmail, UserRole userRole, long tokenValid, String tokenType) {
         Claims claims = Jwts.claims().setSubject(userEmail);
         claims.put("roles", userRole.toString());
+        claims.put("type", tokenType);
 
         Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
         Date date = new Date();
@@ -86,13 +87,13 @@ public class JwtProvider {
 
 
     public String resolveAccessToken(HttpServletRequest request) {
-        if (request.getHeader("authorization") != null )
+        if (request.getHeader("authorization") != null)
             return request.getHeader("authorization").substring(7);
         return null;
     }
 
     public String resolveRefreshToken(HttpServletRequest request) {
-        if (request.getHeader("refreshToken") != null )
+        if (request.getHeader("refreshToken") != null)
             return request.getHeader("refreshToken").substring(7);
         return null;
     }
@@ -130,6 +131,27 @@ public class JwtProvider {
             throw new IllegalArgumentException("JWT claims string is empty");
         } catch (SignatureException e) {
             throw new SignatureException("JWT signature does not match");
+        }
+    }
+
+    public String extractTokenType(String token) {
+        Claims claims = extractClaims(token);
+        if(claims != null && claims.containsKey("type")) {
+            return (String) claims.get("type");
+        } else {
+            throw new UnsupportedJwtException("JWT 토큰이 타입이 없습니다.");
+        }
+    }
+
+    private Claims extractClaims(String token) {
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(secretKey.getBytes())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (IllegalArgumentException e) {
+            throw new UnsupportedJwtException("토큰 타입을 추출할 수 없습니다.");
         }
     }
 

@@ -9,12 +9,14 @@ import com.gamza.ItEat.error.ErrorCode;
 import com.gamza.ItEat.error.exeption.UnAuthorizedException;
 import com.gamza.ItEat.jwt.JwtProvider;
 import com.gamza.ItEat.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -42,25 +44,29 @@ public class UserService {
         userRepository.save(userEntity);
 
         String email = signupRequestDto.getEmail();
-        UserRole userRole = userRepository.findByEmail(email).get().getUserRole();
+        UserRole userRole = userRepository.findByEmail(email).getUserRole();
 
         String AT = jwtProvider.createAccessToken(email, userRole);
         String RT = jwtProvider.createRefreshToken(email, userRole);
 
         userEntity.setRefreshToken(RT);
 
-        response.setHeader("Authorization","Bearer " + AT);
-        response.setHeader("RefreshToken","Bearer "+ RT);
+        response.setHeader("Authorization", "Bearer " + AT);
+        response.setHeader("RefreshToken", "Bearer " + RT);
 
         return ResponseEntity.ok("회원가입 성공");
     }
 
-    public ResponseEntity<String> login(LoginRequestDto loginRequestDto, HttpServletResponse response){
-        UserEntity userEntity = userRepository.findByEmail(loginRequestDto.getEmail())
-                .orElseThrow(()-> new UnAuthorizedException(ErrorCode.INVALID_ACCESS.getMessage(), ErrorCode.INVALID_ACCESS));
+    public ResponseEntity<String> login(LoginRequestDto loginRequestDto, HttpServletResponse response) {
+        UserEntity userEntity = userRepository.findByEmail(loginRequestDto.getEmail());
 
-        if ( !passwordEncoder.matches(loginRequestDto.getPassword(),userEntity.getPassword()) ) {
-            throw new UnAuthorizedException(ErrorCode.INVALID_ACCESS.getMessage(),ErrorCode.INVALID_ACCESS);
+        if(userEntity == null) {
+            throw new UnAuthorizedException(ErrorCode.INVALID_ACCESS.getMessage(), ErrorCode.INVALID_ACCESS);
+        }
+//                .orElseThrow(() -> new UnAuthorizedException(ErrorCode.INVALID_ACCESS.getMessage(), ErrorCode.INVALID_ACCESS));
+
+        if (!passwordEncoder.matches(loginRequestDto.getPassword(), userEntity.getPassword())) {
+            throw new UnAuthorizedException(ErrorCode.INVALID_ACCESS.getMessage(), ErrorCode.INVALID_ACCESS);
         }
 
         String AT = jwtProvider.createAccessToken(userEntity.getEmail(), userEntity.getUserRole());
@@ -68,10 +74,21 @@ public class UserService {
 
         userEntity.setRefreshToken(RT);
 
-        response.setHeader("Authorization","Bearer " + AT);
-        response.setHeader("RefreshToken","Bearer "+ RT);
+        response.setHeader("Authorization", "Bearer " + AT);
+        response.setHeader("RefreshToken", "Bearer " + RT);
 
         return ResponseEntity.ok("로그인 성공");
+    }
+
+    public UserEntity findByUserToken(HttpServletRequest request) {
+        String token = jwtProvider.resolveAccessToken(request);
+        String accessTokenType = jwtProvider.extractTokenType(token);
+
+        if("refresh".equals(accessTokenType)) {
+            throw new UnAuthorizedException("RefreshToken은 사용할 수 없습니다.", ErrorCode.INVALID_TOKEN_EXCEPTION);
+        }
+
+        return token == null ? null : userRepository.findByEmail(jwtProvider.getUserEmail(token));
     }
 
 }
