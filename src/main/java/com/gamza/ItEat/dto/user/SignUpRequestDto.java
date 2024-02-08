@@ -1,4 +1,4 @@
-package com.gamza.ItEat.dto;
+package com.gamza.ItEat.dto.user;
 
 import com.gamza.ItEat.entity.UserEntity;
 import lombok.Data;

@@ -1,8 +1,8 @@
 package com.gamza.ItEat.service;
 
 
-import com.gamza.ItEat.dto.LoginRequestDto;
-import com.gamza.ItEat.dto.SignUpRequestDto;
+import com.gamza.ItEat.dto.user.LoginRequestDto;
+import com.gamza.ItEat.dto.user.SignUpRequestDto;
 import com.gamza.ItEat.entity.UserEntity;
 import com.gamza.ItEat.enums.UserRole;
 import com.gamza.ItEat.error.ErrorCode;

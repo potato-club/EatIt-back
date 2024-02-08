@@ -53,4 +53,10 @@ public class PostEntity extends BaseTime {
     @Column(nullable = false)
     private List<Tag> tags = new ArrayList<>();
 
+    public PostEntity updatePost(String title, String content) { // 추후 수정 내용 추가 일시적으로 제목 내용만 추가
+        this.title = title;
+        this.content = content;
+        return this;
+    }
+
 }

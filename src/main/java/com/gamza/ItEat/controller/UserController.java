@@ -1,8 +1,7 @@
 package com.gamza.ItEat.controller;
 
-import com.gamza.ItEat.dto.LoginRequestDto;
-import com.gamza.ItEat.dto.LoginResponseDto;
-import com.gamza.ItEat.dto.SignUpRequestDto;
+import com.gamza.ItEat.dto.user.LoginRequestDto;
+import com.gamza.ItEat.dto.user.SignUpRequestDto;
 import com.gamza.ItEat.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

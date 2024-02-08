@@ -1,4 +1,4 @@
-package com.gamza.ItEat.dto;
+package com.gamza.ItEat.dto.user;
 
 import lombok.Builder;
 import lombok.Getter;
