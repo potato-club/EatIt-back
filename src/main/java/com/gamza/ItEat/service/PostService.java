@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -55,8 +56,8 @@ public class PostService {
 
     public Long createPost(RequestPostDto requestDto, HttpServletRequest request) {
 
-        UserEntity userEntity = userService.findByUserToken(request);
-        if (userEntity.getUserRole() != UserRole.USER) {
+        Optional<UserEntity> userEntity = userService.findByUserToken(request);
+        if (userEntity.get().getUserRole() != UserRole.USER) {
             throw new UnAuthorizedException("유저 권한이 없습니다.", ErrorCode.ACCESS_DENIED_EXCEPTION);
         } else {
 
@@ -71,9 +72,9 @@ public class PostService {
     }
 
     public Long updatePost(RequestUpdatePostDto updatePostDto, Long id, HttpServletRequest request) {
-        UserEntity userEntity = userService.findByUserToken(request);
+        Optional<UserEntity> userEntity = userService.findByUserToken(request);
 
-        if (userEntity.getUserRole() != UserRole.USER) {
+        if (userEntity.get().getUserRole() != UserRole.USER) {
             throw new UnAuthorizedException("유저 권한이 없습니다.", ErrorCode.ACCESS_DENIED_EXCEPTION);
         } else {
             PostEntity originPost = postRepository.findById(id).
@@ -88,9 +89,9 @@ public class PostService {
     }
 
     public void deletePost(Long id, HttpServletRequest request) {
-        UserEntity userEntity = userService.findByUserToken(request);
+        Optional<UserEntity> userEntity = userService.findByUserToken(request);
 
-        if (userEntity.getUserRole() != UserRole.USER) {
+        if (userEntity.get().getUserRole() != UserRole.USER) {
             throw new UnAuthorizedException("유저 권한이 없습니다.", ErrorCode.ACCESS_DENIED_EXCEPTION);
         } else {
             PostEntity originPost = postRepository.findById(id).

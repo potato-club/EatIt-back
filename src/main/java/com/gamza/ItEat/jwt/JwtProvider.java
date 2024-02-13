@@ -1,8 +1,6 @@
 package com.gamza.ItEat.jwt;
 
 import com.gamza.ItEat.enums.UserRole;
-import com.gamza.ItEat.error.ErrorCode;
-import com.gamza.ItEat.error.exeption.ForbiddenException;
 import com.gamza.ItEat.repository.UserRepository;
 import com.gamza.ItEat.service.jwt.CustomUserDetailService;
 import com.gamza.ItEat.service.jwt.RedisService;
@@ -22,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
-import java.util.Objects;
 
 @Slf4j
 @Component
@@ -129,9 +126,15 @@ public class JwtProvider {
             throw new UnsupportedJwtException("JWT token is unsupported");
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("JWT claims string is empty");
-        } catch (SignatureException e) {
-            throw new SignatureException("JWT signature does not match");
         }
+    }
+
+    //토큰 헤더 설정
+    public void setHeaderAT(HttpServletResponse response, String accessToken) {
+        response.setHeader("authorization", "bearer "+ accessToken);
+    }
+    public void setHeaderRT(HttpServletResponse response, String refreshToken) {
+        response.setHeader("refreshToken", "bearer "+ refreshToken);
     }
 
     public String extractTokenType(String token) {

@@ -37,7 +37,7 @@ public class UserEntity {
     private UserRole userRole;
 
     @Column(nullable = false)
-    private String refreshToken;
+    private boolean deleted;
 
     @Column
     private String profile;
@@ -51,7 +51,4 @@ public class UserEntity {
     @Column(nullable = false)
     private List<Tag> tags;
 
-    public void setRefreshToken(String RT) {
-        this.refreshToken = RT;
-    }
 }
