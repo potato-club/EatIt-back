@@ -37,9 +37,6 @@ public class UserEntity {
     private UserRole userRole;
 
     @Column(nullable = false)
-    private String refreshToken;
-
-    @Column(nullable = false)
     private boolean deleted;
 
     @Column
