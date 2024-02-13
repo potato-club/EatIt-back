@@ -33,7 +33,7 @@ public class JwtAuthorizationTokenFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         String ipAddress = request.getRemoteAddr();
 
-        if (path.contains("/users/login") || path.contains("/users/signup") || path.contains("/users/mail")) {
+        if (path.contains("/login") || path.contains("/signup")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -99,9 +99,9 @@ public class JwtAuthorizationTokenFilter extends OncePerRequestFilter {
     }
 
     private void setAuthentication(String token) {
-        // 토큰으로부터 유저 정보를 받아옵니다.
+        // 토큰으로부터 유저 정보를 받아옴
         Authentication authentication = jwtProvider.getAuthentication(token);
-        // SecurityContext 에 Authentication 객체를 저장합니다.
+        // SecurityContext 에 Authentication 객체를 저장
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
