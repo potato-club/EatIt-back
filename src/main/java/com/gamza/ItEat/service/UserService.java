@@ -2,6 +2,7 @@ package com.gamza.ItEat.service;
 
 
 import com.gamza.ItEat.dto.user.LoginRequestDto;
+import com.gamza.ItEat.dto.user.LoginResponseDto;
 import com.gamza.ItEat.dto.user.SignUpRequestDto;
 import com.gamza.ItEat.entity.UserEntity;
 import com.gamza.ItEat.enums.UserRole;
@@ -9,78 +10,72 @@ import com.gamza.ItEat.error.ErrorCode;
 import com.gamza.ItEat.error.exeption.UnAuthorizedException;
 import com.gamza.ItEat.jwt.JwtProvider;
 import com.gamza.ItEat.repository.UserRepository;
+import com.gamza.ItEat.service.jwt.RedisService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
+
+import static com.gamza.ItEat.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class UserService {
-    private final PasswordEncoder passwordEncoder;
+
     private final UserRepository userRepository;
     private final JwtProvider jwtProvider;
+    private final RedisService redisService;
+    private final PasswordEncoder passwordEncoder;
 
+    public LoginResponseDto login(LoginRequestDto requestDto, HttpServletResponse response) {
+        UserEntity userEntity = userRepository.findByEmail(requestDto.getEmail()).orElseThrow();
 
-    public ResponseEntity<String> signUp(SignUpRequestDto signupRequestDto, HttpServletResponse response) {
-        if (userRepository.existsByEmail(signupRequestDto.getEmail())) {
-            throw new IllegalStateException("이미 존재하는 이메일 입니다.");
+        //패스워드 다를 때
+        if (!passwordEncoder.matches(requestDto.getPassword(), userEntity.getPassword())) {
+            throw new UnAuthorizedException("401", ACCESS_DENIED_EXCEPTION);
         }
 
-        String encryptedPassword = passwordEncoder.encode(signupRequestDto.getPassword());
+        this.setJwtTokenInHeader(requestDto.getEmail(), response);
 
-        UserEntity userEntity = UserEntity.builder()
-                .nickName(signupRequestDto.getNickName())
-                .email(signupRequestDto.getEmail())
-                .password(encryptedPassword)
-                .userRole(UserRole.USER)
-                .refreshToken("dummy")
+        return LoginResponseDto.builder()
+                .responseCode("200")
                 .build();
-
+    }
+    public void signUp(SignUpRequestDto requestDto, HttpServletResponse response) {
+        if (userRepository.existsByEmail(requestDto.getEmail())) {
+            throw new UnAuthorizedException("401", ACCESS_DENIED_EXCEPTION);
+        }
+        //카카오 로그인 로직 추후 추가
+        requestDto.setPassword(passwordEncoder.encode(requestDto.getPassword()));
+        UserEntity userEntity = requestDto.toEntity();
         userRepository.save(userEntity);
-
-        String email = signupRequestDto.getEmail();
-        UserRole userRole = userRepository.findByEmail(email).getUserRole();
-
-        String AT = jwtProvider.createAccessToken(email, userRole);
-        String RT = jwtProvider.createRefreshToken(email, userRole);
-
-        userEntity.setRefreshToken(RT);
-
-        response.setHeader("Authorization", "Bearer " + AT);
-        response.setHeader("RefreshToken", "Bearer " + RT);
-
-        return ResponseEntity.ok("회원가입 성공");
     }
 
-    public ResponseEntity<String> login(LoginRequestDto loginRequestDto, HttpServletResponse response) {
-        UserEntity userEntity = userRepository.findByEmail(loginRequestDto.getEmail());
-
-        if(userEntity == null) {
-            throw new UnAuthorizedException(ErrorCode.INVALID_ACCESS.getMessage(), ErrorCode.INVALID_ACCESS);
-        }
-//                .orElseThrow(() -> new UnAuthorizedException(ErrorCode.INVALID_ACCESS.getMessage(), ErrorCode.INVALID_ACCESS));
-
-        if (!passwordEncoder.matches(loginRequestDto.getPassword(), userEntity.getPassword())) {
-            throw new UnAuthorizedException(ErrorCode.INVALID_ACCESS.getMessage(), ErrorCode.INVALID_ACCESS);
-        }
-
-        String AT = jwtProvider.createAccessToken(userEntity.getEmail(), userEntity.getUserRole());
-        String RT = jwtProvider.createRefreshToken(userEntity.getEmail(), userEntity.getUserRole());
-
-        userEntity.setRefreshToken(RT);
-
-        response.setHeader("Authorization", "Bearer " + AT);
-        response.setHeader("RefreshToken", "Bearer " + RT);
-
-        return ResponseEntity.ok("로그인 성공");
+    public void logout(HttpServletRequest request) {
+        redisService.delValues(jwtProvider.resolveRefreshToken(request));
+        jwtProvider.expireToken(jwtProvider.resolveAccessToken(request));
     }
 
-    public UserEntity findByUserToken(HttpServletRequest request) {
+
+    public void setJwtTokenInHeader(String email, HttpServletResponse response) {
+        UserRole userRole = userRepository.findByEmail(email).get().getUserRole();
+
+        String accessToken = jwtProvider.createAccessToken(email, userRole);
+        String refreshToken = jwtProvider.createRefreshToken(email, userRole);
+
+
+        jwtProvider.setHeaderAT(response, accessToken);
+        jwtProvider.setHeaderRT(response, refreshToken);
+
+        redisService.setValues(refreshToken, email);
+    }
+
+    public Optional<UserEntity> findByUserToken(HttpServletRequest request) {
         String token = jwtProvider.resolveAccessToken(request);
         String accessTokenType = jwtProvider.extractTokenType(token);
 

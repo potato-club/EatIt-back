@@ -1,7 +1,6 @@
 package com.gamza.ItEat.service.jwt;
 
 
-import com.gamza.ItEat.entity.UserEntity;
 import com.gamza.ItEat.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,14 +16,7 @@ public class CustomUserDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-        UserEntity user = userRepository.findByEmail(userName);
-
-        if (user == null) {
-            throw new UsernameNotFoundException(userName + "는 존재하지 않는 사용자입니다.");
-        }
-
-//        return new UserDetailsImpl(userRepository.findByEmail(userName));
-
-        return new UserDetailsImpl(user);
+        return new UserDetailsImpl(userRepository.findByEmail(userName)
+                .orElseThrow(() -> new UsernameNotFoundException("회원이 존재하지 않습니다.")));
     }
 }
