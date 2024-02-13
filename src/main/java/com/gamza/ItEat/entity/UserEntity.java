@@ -40,7 +40,7 @@ public class UserEntity {
     private boolean deleted;
 
     @Column
-    private String profile;
+    private String profile; // 프로필이 null일경우 기본사진 설정
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")

@@ -36,11 +36,15 @@ public class PostEntity extends BaseTime {
     @Column(nullable = false)
     private String content;
 
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = false)
+    private CategoryEntity category;
+
     @Column(nullable = false)
     private int likesNum;
 
     @Column(nullable = false)
-    private int views;
+    private int views; // 게시물 조회수를 어떤식으로 count 할지?
 
     @Column(nullable = false)
     private int commentsNum;

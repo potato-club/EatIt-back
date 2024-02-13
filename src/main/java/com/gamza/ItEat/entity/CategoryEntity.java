@@ -6,9 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Builder
@@ -19,16 +18,12 @@ public class CategoryEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @Column(name = "category_id")
     private Long id;
 
     @Enumerated(EnumType.STRING)
     private CategoryName categoryName;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id")
-    private CategoryEntity parentCategory;
-
-    @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL)
-    private List<CategoryEntity> childCategories = new ArrayList<>();
 
 }
