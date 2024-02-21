@@ -9,7 +9,7 @@ public class ItEatApplication {
 	public static void main(String[] args) {
 
 		SpringApplication.run(ItEatApplication.class, args);
-		System.out.println("성공");
+		System.out.println("성공"); // ㅋㅋㅋ이거뭐임?
 	}
 
 

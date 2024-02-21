@@ -4,16 +4,21 @@ import com.gamza.ItEat.dto.post.RequestPostDto;
 import com.gamza.ItEat.dto.post.RequestUpdatePostDto;
 import com.gamza.ItEat.dto.post.ResponsePostDto;
 import com.gamza.ItEat.dto.post.ResponsePostListDto;
+import com.gamza.ItEat.entity.CategoryEntity;
 import com.gamza.ItEat.entity.PostEntity;
 import com.gamza.ItEat.entity.UserEntity;
+import com.gamza.ItEat.enums.CategoryName;
 import com.gamza.ItEat.enums.UserRole;
 import com.gamza.ItEat.error.ErrorCode;
 import com.gamza.ItEat.error.exeption.BadRequestException;
+import com.gamza.ItEat.error.exeption.NotFoundException;
 import com.gamza.ItEat.error.exeption.UnAuthorizedException;
+import com.gamza.ItEat.repository.CategoryRepository;
 import com.gamza.ItEat.repository.PostRepository;
 import com.gamza.ItEat.utils.ResponseValue;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,9 +31,11 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class PostService {
 
     private final PostRepository postRepository;
+    private final CategoryRepository categoryRepository;
     private final UserService userService;
 
     public ResponsePostListDto findAllPost() {
@@ -54,6 +61,7 @@ public class PostService {
         }
     }
 
+
     public Long createPost(RequestPostDto requestDto, HttpServletRequest request) {
 
         Optional<UserEntity> userEntity = userService.findByUserToken(request);
@@ -61,9 +69,16 @@ public class PostService {
             throw new UnAuthorizedException("유저 권한이 없습니다.", ErrorCode.ACCESS_DENIED_EXCEPTION);
         } else {
 
+            CategoryEntity category = categoryRepository.findByCategoryName(requestDto.getCategoryName());
+
+            if(category == null) {
+                throw new NotFoundException("404", ErrorCode.NOT_FOUND_EXCEPTION);
+            }
+
             PostEntity post = PostEntity.builder()
                     .title(requestDto.getTitle())
                     .content(requestDto.getContent())
+                    .category(category)
                     .build();
             PostEntity savedPost = postRepository.save(post); // 게시물 저장하고
 
