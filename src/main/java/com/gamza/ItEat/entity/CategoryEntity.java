@@ -26,6 +26,7 @@ public class CategoryEntity {
     private Long id;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "category_name")
     private CategoryName categoryName;
 
     @OneToMany(mappedBy = "category",cascade = CascadeType.ALL, orphanRemoval = true)

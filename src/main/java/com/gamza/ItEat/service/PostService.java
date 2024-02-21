@@ -1,34 +1,35 @@
 package com.gamza.ItEat.service;
 
-import com.gamza.ItEat.dto.post.RequestPostDto;
-import com.gamza.ItEat.dto.post.RequestUpdatePostDto;
-import com.gamza.ItEat.dto.post.ResponsePostDto;
-import com.gamza.ItEat.dto.post.ResponsePostListDto;
+import com.gamza.ItEat.dto.post.*;
+import com.gamza.ItEat.entity.CategoryEntity;
 import com.gamza.ItEat.entity.PostEntity;
 import com.gamza.ItEat.entity.UserEntity;
 import com.gamza.ItEat.enums.UserRole;
 import com.gamza.ItEat.error.ErrorCode;
 import com.gamza.ItEat.error.exeption.BadRequestException;
+import com.gamza.ItEat.error.exeption.NotFoundException;
 import com.gamza.ItEat.error.exeption.UnAuthorizedException;
+import com.gamza.ItEat.repository.CategoryRepository;
 import com.gamza.ItEat.repository.PostRepository;
 import com.gamza.ItEat.utils.ResponseValue;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class PostService {
 
     private final PostRepository postRepository;
+    private final CategoryRepository categoryRepository;
     private final UserService userService;
 
     public ResponsePostListDto findAllPost() {
@@ -54,6 +55,37 @@ public class PostService {
         }
     }
 
+    public PaginationDto findPostByCategoryId(Long categoryId, Pageable pageable) {
+        Optional<CategoryEntity> id = categoryRepository.findById(categoryId);
+        CategoryEntity categoryName = categoryRepository.findByCategoryName(id.get().getCategoryName());
+
+        if (categoryName == null) {
+            throw new BadRequestException("카테고리를 찾을 수 없습니다.", ErrorCode.NOT_FOUND_EXCEPTION);
+        }
+
+        List<PostEntity> postList = id.stream()
+                .flatMap(category -> category.getPosts().stream())
+                .sorted(Comparator.comparing(PostEntity::getCreatedAt).reversed())
+                .collect(Collectors.toList());
+
+        int pageSize = pageable.getPageSize();
+        int currentPage = pageable.getPageNumber();
+        int startItem = currentPage * pageSize;
+        int endItem = Math.min(startItem + pageSize, postList.size());
+
+        List<PostEntity> pageContent = postList.subList(startItem, endItem);
+        List<ResponsePostDto> postDtos = pageContent.stream()
+                .map(ResponseValue::getAllBuild)
+                .collect(Collectors.toList());
+
+        long totalPages = (long) Math.ceil((double) postList.size() / (double) pageSize);
+        boolean isLastPage = !pageable.isPaged() || currentPage >= totalPages - 1;
+
+        return ResponseValue.getPaginationDto(totalPages, isLastPage, (long) postList.size(), postDtos);
+
+    }
+
+
     public Long createPost(RequestPostDto requestDto, HttpServletRequest request) {
 
         Optional<UserEntity> userEntity = userService.findByUserToken(request);
@@ -61,9 +93,16 @@ public class PostService {
             throw new UnAuthorizedException("유저 권한이 없습니다.", ErrorCode.ACCESS_DENIED_EXCEPTION);
         } else {
 
+            CategoryEntity category = categoryRepository.findByCategoryName(requestDto.getCategoryName());
+
+            if (category == null) {
+                throw new NotFoundException("카테고리를 찾을 수 없습니다.", ErrorCode.NOT_FOUND_EXCEPTION);
+            }
+
             PostEntity post = PostEntity.builder()
                     .title(requestDto.getTitle())
                     .content(requestDto.getContent())
+                    .category(category)
                     .build();
             PostEntity savedPost = postRepository.save(post); // 게시물 저장하고
 
@@ -80,6 +119,8 @@ public class PostService {
             PostEntity originPost = postRepository.findById(id).
                     orElseThrow(() -> new BadRequestException("게시물이 존재하지 않습니다.", ErrorCode.RUNTIME_EXCEPTION)); // 오류 출력 게시물 없을떄 따로하나 만들어야겠다.
 
+            // 카테고리도 수정할수있게 해줘야하나 ? 흠
+
             String updatedTitle = updatePostDto.getTitle();
             String updatedContent = updatePostDto.getContent();
 
@@ -94,10 +135,11 @@ public class PostService {
         if (userEntity.get().getUserRole() != UserRole.USER) {
             throw new UnAuthorizedException("유저 권한이 없습니다.", ErrorCode.ACCESS_DENIED_EXCEPTION);
         } else {
+
             PostEntity originPost = postRepository.findById(id).
                     orElseThrow(() -> new BadRequestException("게시물이 존재하지 않습니다.", ErrorCode.RUNTIME_EXCEPTION));
 
-            postRepository.deleteById(id);
+            postRepository.deleteById(originPost.getId());
         }
     }
 
