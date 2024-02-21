@@ -1,11 +1,15 @@
 package com.gamza.ItEat.controller;
 
+import com.gamza.ItEat.dto.post.PaginationDto;
 import com.gamza.ItEat.dto.post.RequestPostDto;
 import com.gamza.ItEat.dto.post.RequestUpdatePostDto;
 import com.gamza.ItEat.dto.post.ResponsePostListDto;
 import com.gamza.ItEat.service.PostService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.Parameter;
+import org.junit.runners.Parameterized;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +24,18 @@ public class PostController {
     public ResponsePostListDto findAll() {
         ResponsePostListDto all = postService.findAllPost();
         return all;
+    }
+
+    @GetMapping("/{categoryId}")
+    public PaginationDto findPostByCategory(
+            @PathVariable Long categoryId,
+            @RequestParam(defaultValue = "0")
+            int page,
+            @RequestParam(defaultValue = "4")
+            int size) {
+        PaginationDto allPostByParentCategory = postService.findPostByCategoryId(categoryId, PageRequest.of(page, size));
+        return allPostByParentCategory;
+
     }
 
     @PostMapping()
