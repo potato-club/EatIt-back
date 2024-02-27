@@ -1,9 +1,6 @@
 package com.gamza.ItEat.controller;
 
-import com.gamza.ItEat.dto.post.PaginationDto;
-import com.gamza.ItEat.dto.post.RequestPostDto;
-import com.gamza.ItEat.dto.post.RequestUpdatePostDto;
-import com.gamza.ItEat.dto.post.ResponsePostListDto;
+import com.gamza.ItEat.dto.post.*;
 import com.gamza.ItEat.service.PostService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +10,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/post")
 @RequiredArgsConstructor
@@ -20,22 +19,26 @@ public class PostController {
 
     private final PostService postService;
 
-    @GetMapping
+    @GetMapping  // 모든 게시물 조회
     public ResponsePostListDto findAll() {
         ResponsePostListDto all = postService.findAllPost();
         return all;
     }
 
-    @GetMapping("/{categoryId}")
+    @GetMapping("/{category}") // 카테고리별 게시물 조회
     public PaginationDto findPostByCategory(
-            @PathVariable Long categoryId,
+            @PathVariable Long category,
             @RequestParam(defaultValue = "0")
             int page,
-            @RequestParam(defaultValue = "4")
+            @RequestParam(defaultValue = "8") // 8개씩
             int size) {
-        PaginationDto allPostByParentCategory = postService.findPostByCategoryId(categoryId, PageRequest.of(page, size));
+        PaginationDto allPostByParentCategory = postService.findPostByCategoryId(category, PageRequest.of(page, size));
         return allPostByParentCategory;
+    }
 
+    @GetMapping("/like")
+    public List<ResponsePostDto> getPostLowerThanId(@RequestParam Long lastPostId, @RequestParam int size) {
+        return postService.findAllPostByLogic(lastPostId, size);
     }
 
     @PostMapping()

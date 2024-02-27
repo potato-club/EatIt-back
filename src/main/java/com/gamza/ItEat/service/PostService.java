@@ -15,6 +15,8 @@ import com.gamza.ItEat.utils.ResponseValue;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,6 +55,16 @@ public class PostService {
                     .posts(collect)
                     .build();
         }
+    }
+
+    public List<ResponsePostDto> findAllPostByLogic(Long lastPostId, int size) {
+        PageRequest pageRequest = PageRequest.of(0,size);
+        Page<PostEntity> entityPage = postRepository.findByIdLessThanOrderByIdDesc(lastPostId, pageRequest);
+        List<PostEntity> postEntityList = entityPage.getContent();
+
+        return postEntityList.stream()
+                .map(ResponseValue::getAllBuild)
+                .collect(Collectors.toList());
     }
 
     public PaginationDto findPostByCategoryId(Long categoryId, Pageable pageable) {
