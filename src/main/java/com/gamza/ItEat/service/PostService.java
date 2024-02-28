@@ -20,7 +20,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 
+import java.nio.file.AccessDeniedException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -33,6 +35,12 @@ public class PostService {
     private final PostRepository postRepository;
     private final CategoryRepository categoryRepository;
     private final UserService userService;
+
+    public ResponsePostDto findOnePost(Long id) {
+        Optional<PostEntity> postOptional = postRepository.findById(id);
+        PostEntity post = postOptional.orElseThrow(() -> new NoSuchElementException("게시물이 존재하지 않습니다."));
+        return ResponseValue.getOneBuild(post);
+    }
 
     public ResponsePostListDto findAllPost() {
 
@@ -58,7 +66,7 @@ public class PostService {
     }
 
     public List<ResponsePostDto> findAllPostByLogic(Long lastPostId, int size) {
-        PageRequest pageRequest = PageRequest.of(0,size);
+        PageRequest pageRequest = PageRequest.of(0, size);
         Page<PostEntity> entityPage = postRepository.findByIdLessThanOrderByIdDesc(lastPostId, pageRequest);
         List<PostEntity> postEntityList = entityPage.getContent();
 
@@ -152,6 +160,17 @@ public class PostService {
                     orElseThrow(() -> new BadRequestException("게시물이 존재하지 않습니다.", ErrorCode.RUNTIME_EXCEPTION));
 
             postRepository.deleteById(originPost.getId());
+        }
+    }
+
+    public void getPostView(Long id) {
+        Optional<PostEntity> post = postRepository.findById(id);
+        if (post.isPresent()) {
+            PostEntity postEntity = post.get();
+            postEntity.increaseViews();
+            postRepository.save(postEntity);
+        } else {
+            throw new NotFoundException("잘못된 접근입니다.", ErrorCode.ACCESS_DENIED_EXCEPTION);
         }
     }
 

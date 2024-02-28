@@ -43,7 +43,7 @@ public class PostEntity extends BaseTime {
     @Column(nullable = false)
     private int likesNum;
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "integer default 0", nullable = false) // 기본 조회수는 0
     private int views; // 게시물 조회수를 어떤식으로 count 할지?
 
     @Column(nullable = false)
@@ -61,6 +61,10 @@ public class PostEntity extends BaseTime {
         this.title = title;
         this.content = content;
         return this;
+    }
+
+    public int increaseViews() {
+        return this.views += 1;
     }
 
 }

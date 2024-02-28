@@ -16,8 +16,26 @@ public class ResponseValue {
                     .id(postEntity.getId())
                     .title(postEntity.getTitle())
                     .content(postEntity.getContent())
+                    .views(postEntity.getViews())
+                    .categoryName(postEntity.getCategory().getCategoryName())
                     .createdAt(postEntity.getCreatedAt())
                     .updatedAt(postEntity.getModifiedAt())
+                    .build();
+        } else {
+            throw new BadRequestException("존재하는 게시물이 없습니다!", ErrorCode.RUNTIME_EXCEPTION);
+        }
+    }
+
+    public static ResponsePostDto getOneBuild(PostEntity postEntity) {
+        if(postEntity != null) {
+            return ResponsePostDto.builder()
+                    .id(postEntity.getId())
+                    .title(postEntity.getTitle())
+                    .content(postEntity.getContent())
+                    .views(postEntity.getViews())
+                    .categoryName(postEntity.getCategory().getCategoryName())
+                    .createdAt(postEntity.getCreatedAt())
+//                    .updatedAt(postEntity.getModifiedAt())
                     .build();
         } else {
             throw new BadRequestException("존재하는 게시물이 없습니다!", ErrorCode.RUNTIME_EXCEPTION);

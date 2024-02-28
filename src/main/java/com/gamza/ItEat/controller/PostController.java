@@ -25,6 +25,12 @@ public class PostController {
         return all;
     }
 
+    @GetMapping("/{id}")
+    public ResponsePostDto findOnePost(@PathVariable("id") Long id) {
+        ResponsePostDto one = postService.findOnePost(id);
+        return one;
+    }
+
     @GetMapping("/{category}") // 카테고리별 게시물 조회
     public PaginationDto findPostByCategory(
             @PathVariable Long category,

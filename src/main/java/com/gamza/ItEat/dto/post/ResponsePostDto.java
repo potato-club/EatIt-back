@@ -19,6 +19,7 @@ public class ResponsePostDto {
     private String title;
     private String content;
     private CategoryName categoryName;
+    private int views;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd", timezone = "Asia/Seoul")
     private LocalDateTime createdAt;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd", timezone = "Asia/Seoul")
