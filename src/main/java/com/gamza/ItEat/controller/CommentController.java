@@ -19,4 +19,10 @@ public class CommentController {
         commentService.createComment(id, dto, request);
         return ResponseEntity.ok().body("댓글이 생성되었습니다.");
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteComment(@PathVariable("id") Long id, HttpServletRequest request) {
+        commentService.deleteComment(id, request);
+        return ResponseEntity.ok().body("댓글이 삭제되었습니다.");
+    }
 }

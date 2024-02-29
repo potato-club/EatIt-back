@@ -6,6 +6,7 @@ import com.gamza.ItEat.entity.CommentEntity;
 import com.gamza.ItEat.entity.PostEntity;
 import com.gamza.ItEat.entity.UserEntity;
 import com.gamza.ItEat.error.ErrorCode;
+import com.gamza.ItEat.error.exeption.NotFoundException;
 import com.gamza.ItEat.error.exeption.UnAuthorizedException;
 import com.gamza.ItEat.repository.CommentRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,5 +41,19 @@ public class CommentService {
             CommentEntity save = commentRepository.save(comment);
             return new CommentResponseDto(save);
         }
+    }
+
+    public void deleteComment(Long id, HttpServletRequest request) {
+        Optional<UserEntity> user = userService.findByUserToken(request);
+
+        if (user.get().getUserRole() == null) {
+            throw new UnAuthorizedException("로그인후 이용해주세요.", ErrorCode.NOT_ALLOW_WRITE_EXCEPTION);
+        } else {
+            CommentEntity commentId = commentRepository.findById(id)
+                    .orElseThrow(() -> new NotFoundException( "댓글이 존재하지않습니다.",ErrorCode.NOT_FOUND_EXCEPTION));
+
+            commentRepository.deleteById(commentId.getId());
+        }
+
     }
 }
