@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,13 +65,28 @@ public class PostService {
     }
 
     public List<ResponsePostDto> findAllPostByLogic(Long lastPostId, int size) { // 좋아요순으로 변경하도록 추가
+
+//        Sort sortByLikes = Sort.by(Sort.Direction.DESC, "likesNum");
+//        List<PostEntity> postEntityList = postRepository.findAllOrderByLikesDesc();
+
         PageRequest pageRequest = PageRequest.of(0, size);
         Page<PostEntity> entityPage = postRepository.findByIdLessThanOrderByIdDesc(lastPostId, pageRequest);
-        List<PostEntity> postEntityList = entityPage.getContent();
+//        List<PostEntity> postEntityList = entityPage.getContent();
+        List<PostEntity> postEntityList = postRepository.findAllOrderByLikesDesc();
 
-        return postEntityList.stream()
-                .map(ResponseValue::getAllBuild)
+        List<ResponsePostDto> responsePostDtos  = postEntityList.stream()
+                .map(postEntity -> ResponsePostDto.builder()
+                        .id(postEntity.getId())
+                        .createdAt(postEntity.getCreatedAt())
+                        .likeNums(postEntity.getLikesNum())
+                        .views(postEntity.getViews())
+                        .title(postEntity.getTitle())
+                        .content(postEntity.getContent())
+                        .categoryName(postEntity.getCategory().getCategoryName())
+                        .build())
                 .collect(Collectors.toList());
+        return responsePostDtos;
+
     }
 
     public PaginationDto findPostByCategoryId(Long categoryId, Pageable pageable) {
