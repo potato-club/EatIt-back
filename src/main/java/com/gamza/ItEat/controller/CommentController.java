@@ -1,11 +1,14 @@
 package com.gamza.ItEat.controller;
 
 import com.gamza.ItEat.dto.comment.CommentRequestDto;
+import com.gamza.ItEat.dto.comment.CommentResponseDto;
 import com.gamza.ItEat.service.CommentService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -13,6 +16,11 @@ import org.springframework.web.bind.annotation.*;
 public class CommentController {
 
     private final CommentService commentService;
+
+    @GetMapping("/{id}")
+    public List<CommentResponseDto> getCommentLowerThanIdByPost(@PathVariable("id") Long id, @RequestParam Long lastCommentId, @RequestParam int size) {
+        return commentService.findAllCommentByPost(id, lastCommentId, size);
+    }
 
     @PostMapping("/{id}") // 게시물 id값
     public ResponseEntity<String> createComment(@RequestBody CommentRequestDto dto, @PathVariable("id") Long id, HttpServletRequest request) {

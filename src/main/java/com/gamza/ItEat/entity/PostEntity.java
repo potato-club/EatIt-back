@@ -40,7 +40,7 @@ public class PostEntity extends BaseTime {
     @JoinColumn(name = "category_id", nullable = false)
     private CategoryEntity category;
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "integer default 0", nullable = false)
     private int likesNum;
 
     @Column(columnDefinition = "integer default 0", nullable = false) // 기본 조회수는 0
