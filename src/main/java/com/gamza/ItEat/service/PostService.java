@@ -174,5 +174,10 @@ public class PostService {
         }
     }
 
+    public PostEntity getPostId(Long postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException("게시물이 존재하지 않습니다.", ErrorCode.NOT_FOUND_EXCEPTION));
+    }
+
 
 }
