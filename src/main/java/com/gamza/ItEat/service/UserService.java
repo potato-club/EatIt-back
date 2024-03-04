@@ -1,9 +1,9 @@
 package com.gamza.ItEat.service;
 
-
 import com.gamza.ItEat.dto.user.LoginRequestDto;
 import com.gamza.ItEat.dto.user.LoginResponseDto;
 import com.gamza.ItEat.dto.user.SignUpRequestDto;
+import com.gamza.ItEat.dto.user.UserUpdateRequestDto;
 import com.gamza.ItEat.entity.UserEntity;
 import com.gamza.ItEat.enums.UserRole;
 import com.gamza.ItEat.error.ErrorCode;
@@ -11,16 +11,17 @@ import com.gamza.ItEat.error.exeption.UnAuthorizedException;
 import com.gamza.ItEat.jwt.JwtProvider;
 import com.gamza.ItEat.repository.UserRepository;
 import com.gamza.ItEat.service.jwt.RedisService;
+import io.jsonwebtoken.io.IOException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Optional;
 
 import static com.gamza.ItEat.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
+import static com.gamza.ItEat.error.ErrorCode.NOT_FOUND_EXCEPTION;
 
 @Service
 @Transactional
@@ -33,6 +34,19 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     public LoginResponseDto login(LoginRequestDto requestDto, HttpServletResponse response) {
+
+        if (!userRepository.existsByEmailAndDeleted(requestDto.getEmail(), false)) {
+            if (!userRepository.existsByEmail(requestDto.getEmail())) {
+                return LoginResponseDto.builder()
+                        .responseCode("2001")   // 회원이 아닐 경우
+                        .build();
+            } else if (userRepository.existsByEmailAndDeletedIsTrue(requestDto.getEmail())) {
+                return LoginResponseDto.builder()
+                        .responseCode("2002")   // 탈퇴한 회원인 경우
+                        .build();
+            }
+        }
+
         UserEntity userEntity = userRepository.findByEmail(requestDto.getEmail()).orElseThrow();
 
         //패스워드 다를 때
@@ -61,6 +75,18 @@ public class UserService {
         jwtProvider.expireToken(jwtProvider.resolveAccessToken(request));
     }
 
+
+    public void withdrawUser(HttpServletRequest request) {
+        Optional<UserEntity> user = findByUserToken(request);
+
+        if (user.isPresent()) {
+            UserEntity userEntity = user.get();
+            userEntity.setDeleted(true);
+            this.logout(request);
+        } else {
+            throw new UnAuthorizedException("404", NOT_FOUND_EXCEPTION);
+        }
+    }
 
     public void setJwtTokenInHeader(String email, HttpServletResponse response) {
         UserRole userRole = userRepository.findByEmail(email).get().getUserRole();
