@@ -49,8 +49,9 @@ public class SecurityConfig {
         http.httpBasic(AbstractHttpConfigurer::disable);
 
         http.authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/signup","/login","/").permitAll()
-                .anyRequest().permitAll()
+                .requestMatchers("/signup","/login").permitAll()
+                .anyRequest().authenticated()
+
 
         );
 

@@ -1,5 +1,6 @@
 package com.gamza.ItEat.entity;
 
+import com.gamza.ItEat.dto.user.UserUpdateRequestDto;
 import com.gamza.ItEat.enums.Tag;
 import com.gamza.ItEat.enums.UserRole;
 import jakarta.persistence.*;
@@ -51,4 +52,8 @@ public class UserEntity {
     @Column(nullable = false)
     private List<Tag> tags;
 
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
 }
