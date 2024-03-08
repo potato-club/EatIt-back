@@ -1,7 +1,7 @@
 package com.gamza.ItEat.config;
 
 import io.swagger.v3.oas.models.info.Info;
-import org.springdoc.core.GroupedOpenApi;
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -17,7 +17,7 @@ public class SwaggerConfig {
                 .group("post")
                 .pathsToMatch(paths)
                 .displayName("Post's API")
-                .addOpenApiCustomiser(api -> api.setInfo(info))
+                .addOpenApiCustomizer(api -> api.setInfo(info))
                 .build();
     }
 
@@ -30,7 +30,7 @@ public class SwaggerConfig {
                 .group("comment")
                 .pathsToMatch(paths)
                 .displayName("Comment's API")
-                .addOpenApiCustomiser(api -> api.setInfo(info))
+                .addOpenApiCustomizer(api -> api.setInfo(info))
                 .build();
     }
 
@@ -43,7 +43,7 @@ public class SwaggerConfig {
                 .group("client")
                 .pathsToMatch(paths)
                 .displayName("Client's API")
-                .addOpenApiCustomiser(api -> api.setInfo(info))
+                .addOpenApiCustomizer(api -> api.setInfo(info))
                 .build();
     }
 }

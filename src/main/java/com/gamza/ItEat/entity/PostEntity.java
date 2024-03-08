@@ -1,7 +1,5 @@
 package com.gamza.ItEat.entity;
 
-
-import com.gamza.ItEat.enums.Tag;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +9,9 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -52,10 +52,13 @@ public class PostEntity extends BaseTime {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<FileEntity> images = new ArrayList<>();
 
-    @ElementCollection(targetClass = Tag.class)
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private List<Tag> tags = new ArrayList<>();
+    @ManyToMany
+    @JoinTable(
+            name = "post_tags",
+            joinColumns = @JoinColumn(name = "post_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private Set<TagEntity> tags;
 
     public PostEntity updatePost(String title, String content) { // 추후 수정 내용 추가 일시적으로 제목 내용만 추가
         this.title = title;
