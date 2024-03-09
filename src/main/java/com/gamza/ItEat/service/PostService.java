@@ -3,6 +3,7 @@ package com.gamza.ItEat.service;
 import com.gamza.ItEat.dto.post.*;
 import com.gamza.ItEat.entity.CategoryEntity;
 import com.gamza.ItEat.entity.PostEntity;
+import com.gamza.ItEat.entity.TagEntity;
 import com.gamza.ItEat.entity.UserEntity;
 import com.gamza.ItEat.enums.UserRole;
 import com.gamza.ItEat.error.ErrorCode;
@@ -11,6 +12,7 @@ import com.gamza.ItEat.error.exeption.NotFoundException;
 import com.gamza.ItEat.error.exeption.UnAuthorizedException;
 import com.gamza.ItEat.repository.CategoryRepository;
 import com.gamza.ItEat.repository.PostRepository;
+import com.gamza.ItEat.repository.TagRepository;
 import com.gamza.ItEat.utils.ResponseValue;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +35,7 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final CategoryRepository categoryRepository;
+    private final TagRepository tagRepository;
     private final UserService userService;
 
     public ResponsePostDto findOnePost(Long id) {
@@ -66,12 +69,9 @@ public class PostService {
 
     public List<ResponsePostDto> findAllPostByLogic(Long lastPostId, int size) { // 좋아요순으로 변경하도록 추가
 
-//        Sort sortByLikes = Sort.by(Sort.Direction.DESC, "likesNum");
-//        List<PostEntity> postEntityList = postRepository.findAllOrderByLikesDesc();
 
         PageRequest pageRequest = PageRequest.of(0, size);
         Page<PostEntity> entityPage = postRepository.findByIdLessThanOrderByIdDesc(lastPostId, pageRequest);
-//        List<PostEntity> postEntityList = entityPage.getContent();
         List<PostEntity> postEntityList = postRepository.findAllOrderByLikesDesc();
 
         List<ResponsePostDto> responsePostDtos  = postEntityList.stream()
@@ -129,6 +129,13 @@ public class PostService {
 
             CategoryEntity category = categoryRepository.findByCategoryName(requestDto.getCategoryName());
 
+            List<TagEntity> tags = tagRepository.findByTagIn(requestDto.getTags());
+            Set<TagEntity> distinctTags = new HashSet<>(tags);
+
+            if(distinctTags.size() > 5){
+                throw new BadRequestException("태그는 5개까지만 가능합니다.",ErrorCode.NOT_FOUND_EXCEPTION);
+            }
+
             if (category == null) {
                 throw new NotFoundException("카테고리를 찾을 수 없습니다.", ErrorCode.NOT_FOUND_EXCEPTION);
             }
@@ -136,6 +143,7 @@ public class PostService {
             PostEntity post = PostEntity.builder()
                     .title(requestDto.getTitle())
                     .content(requestDto.getContent())
+                    .tags(distinctTags)
                     .category(category)
                     .build();
             PostEntity savedPost = postRepository.save(post); // 게시물 저장하고
