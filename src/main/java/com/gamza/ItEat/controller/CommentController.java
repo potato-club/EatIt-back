@@ -33,6 +33,13 @@ public class CommentController {
         return ResponseEntity.ok().body("댓글이 생성되었습니다.");
     }
 
+    @Operation(summary = "댓글 수정 (유저권한 필요)")
+    @PutMapping("/{id}")
+    public ResponseEntity<String> updateComment(@RequestBody CommentRequestDto dto, @PathVariable("id") Long id, HttpServletRequest request) {
+        commentService.updateComment(id,dto,request);
+        return ResponseEntity.ok().body("댓글이 수정되었습니다.");
+    }
+
     @Operation(summary = "댓글 삭제 (유저권한 필요)")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteComment(@PathVariable("id") Long id, HttpServletRequest request) {

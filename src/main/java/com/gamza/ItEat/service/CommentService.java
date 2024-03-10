@@ -30,11 +30,11 @@ public class CommentService {
     private final PostService postService;
     private final UserService userService;
 
-    public List<CommentResponseDto> findAllCommentByPost(Long id,Long lastCommentId, int size) {
+    public List<CommentResponseDto> findAllCommentByPost(Long id, Long lastCommentId, int size) {
 
         Long postId = postService.getPostId(id).getId();
 
-        if(postId != null) {
+        if (postId != null) {
             PageRequest pageRequest = PageRequest.of(0, size);
             Page<CommentEntity> entityPage = commentRepository.findByPostIdAndIdLessThanOrderByIdDesc(postId, lastCommentId, pageRequest);
             List<CommentEntity> commentEntityList = entityPage.getContent();
@@ -72,6 +72,22 @@ public class CommentService {
         }
     }
 
+    public Long updateComment(Long commentId, CommentRequestDto dto, HttpServletRequest request) {
+
+        Optional<UserEntity> user = userService.findByUserToken(request);
+        if(user.get().getUserRole() == null) {
+            throw new UnAuthorizedException("로그인후 이용해주세요.", ErrorCode.NOT_ALLOW_WRITE_EXCEPTION);
+        } else {
+            CommentEntity comment = commentRepository.findById(commentId).
+                    orElseThrow(() -> new NotFoundException("댓글이 존재하지 않습니다.", ErrorCode.NOT_FOUND_EXCEPTION));
+
+            String updateContent = dto.getComment();
+            comment.updateComment(updateContent);
+
+            return commentRepository.save(comment).getId();
+        }
+    }
+
     public void deleteComment(Long id, HttpServletRequest request) {
         Optional<UserEntity> user = userService.findByUserToken(request);
 
@@ -84,5 +100,10 @@ public class CommentService {
             commentRepository.deleteById(commentId.getId());
         }
 
+    }
+
+    public CommentEntity findCommentId(Long commentId) {
+        return commentRepository.findById(commentId)
+                .orElseThrow(() -> new NotFoundException("댓글이 존재하지 않습니다.", ErrorCode.NOT_FOUND_EXCEPTION));
     }
 }

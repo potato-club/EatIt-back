@@ -16,7 +16,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommentEntity extends BaseTime{
+public class CommentEntity extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,4 +42,9 @@ public class CommentEntity extends BaseTime{
     @ManyToOne
     @JoinColumn(name = "post_id")
     private PostEntity post;
+
+    public CommentEntity updateComment(String content) {
+        this.content = content;
+        return this;
+    }
 }
