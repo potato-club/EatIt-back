@@ -1,14 +1,20 @@
 package com.gamza.ItEat.service;
 
 
+import com.gamza.ItEat.dto.post.PaginationDto;
 import com.gamza.ItEat.dto.user.LoginRequestDto;
 import com.gamza.ItEat.dto.user.LoginResponseDto;
 import com.gamza.ItEat.dto.user.SignUpRequestDto;
+import com.gamza.ItEat.entity.PostEntity;
+import com.gamza.ItEat.entity.TagEntity;
 import com.gamza.ItEat.entity.UserEntity;
+import com.gamza.ItEat.enums.Tag;
 import com.gamza.ItEat.enums.UserRole;
 import com.gamza.ItEat.error.ErrorCode;
 import com.gamza.ItEat.error.exeption.UnAuthorizedException;
 import com.gamza.ItEat.jwt.JwtProvider;
+import com.gamza.ItEat.repository.PostRepository;
+import com.gamza.ItEat.repository.TagRepository;
 import com.gamza.ItEat.repository.UserRepository;
 import com.gamza.ItEat.service.jwt.RedisService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +24,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static com.gamza.ItEat.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
@@ -28,6 +36,8 @@ import static com.gamza.ItEat.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final TagRepository tagRepository;
+    private final PostRepository postRepository;
     private final JwtProvider jwtProvider;
     private final RedisService redisService;
     private final PasswordEncoder passwordEncoder;
@@ -85,6 +95,16 @@ public class UserService {
 
         return token == null ? null : userRepository.findByEmail(jwtProvider.getUserEmail(token));
     }
+
+//    public PaginationDto searchPostByTags(List<Tag> tags, Long page, Long size) {
+//        List<PostEntity> posts = postRepository.findByTagsInOrOrderByCreatedAtDesc(tags);
+//
+//        Long start = page * size;
+//        Long end = Math.min(start + size, posts.size());
+//        List<PostEntity> paginatedPosts = new ArrayList<>(posts).subList(start, end);
+//
+//        return new PaginationDto(page, end, posts.size(),paginatedPosts);
+//    }
 
 }
 
