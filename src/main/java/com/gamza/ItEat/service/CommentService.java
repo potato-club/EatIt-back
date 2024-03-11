@@ -63,7 +63,7 @@ public class CommentService {
             PostEntity post = postService.getPostId(postId);
 
             CommentEntity comment = CommentEntity.builder()
-                    .content(dto.getComment())
+                    .content(dto.getContent())
                     .post(post)
                     .user(user.get())
                     .build();
@@ -81,7 +81,7 @@ public class CommentService {
             CommentEntity comment = commentRepository.findById(commentId).
                     orElseThrow(() -> new NotFoundException("댓글이 존재하지 않습니다.", ErrorCode.NOT_FOUND_EXCEPTION));
 
-            String updateContent = dto.getComment();
+            String updateContent = dto.getContent();
             comment.updateComment(updateContent);
 
             return commentRepository.save(comment).getId();

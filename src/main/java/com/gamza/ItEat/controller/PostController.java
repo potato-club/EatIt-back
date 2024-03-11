@@ -6,8 +6,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.annotations.Parameter;
-import org.junit.runners.Parameterized;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -73,6 +71,12 @@ public class PostController {
     public ResponseEntity<String> deletePost(@PathVariable("id") Long id, HttpServletRequest request) {
         postService.deletePost(id, request);
         return ResponseEntity.ok().body("게시물이 삭제되었습니다.");
+    }
+
+    @Operation(summary = "게시물 조회수 조회")
+    @GetMapping("/{id}")
+    public int getPostViews(@PathVariable("id") Long id) {
+        return postService.getPostViews(id);
     }
 
 }
