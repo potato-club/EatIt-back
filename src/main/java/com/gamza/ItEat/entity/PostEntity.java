@@ -66,6 +66,14 @@ public class PostEntity extends BaseTime {
         return this;
     }
 
+    public int increaseLikesNums() {
+        return this.likesNum += 1;
+    }
+
+    public int decreaseLikesNums() {
+        return this.likesNum -= 1;
+    }
+
     public int increaseViews() {
         return this.views += 1;
     }
