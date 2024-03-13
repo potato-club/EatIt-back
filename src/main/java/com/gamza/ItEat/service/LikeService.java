@@ -30,17 +30,29 @@ public class LikeService {
         PostEntity post = postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException("잘못된 요청입니다.", ErrorCode.RUNTIME_EXCEPTION));
 
-        LikeEntity like = likeRepository.findByUserAndPost(userEntity.orElse(null), post);
+        LikeEntity likeEntity = likeRepository.findByUserAndPost(userEntity.orElse(null), post);
 
-        if(likeDto.isUnLiked()) {
-            likeRepository.delete(like);
-            post.increaseLikesNums();
-            return ResponseEntity.ok().body("좋아요가 눌렸습니다.");
+        if (likeDto.isUnLiked()) {
+            if (likeEntity != null) {
+                likeRepository.delete(likeEntity);
+                post.decreaseLikesNums();
+                return ResponseEntity.ok().body("좋아요가 취소되었습니다.");
+            }
         } else {
-            likeRepository.save(like);
-            post.decreaseLikesNums();
-            return ResponseEntity.ok().body("좋아요가 취소되었습니다.");
+            if (likeEntity == null) {
+                likeEntity = LikeEntity.builder()
+                        .user(userEntity.orElse(null))
+                        .post(post)
+                        .isDeleted(false)
+                        .unLiked(false)
+                        .build();
+                likeRepository.save(likeEntity);
+                post.increaseLikesNums();
+                return ResponseEntity.ok().body("좋아요가 눌렸습니다.");
+            }
         }
+
+        return ResponseEntity.ok().body("이미 좋아요 상태입니다.");
     }
 
     private void decreaseLikeCount(Long postId) {

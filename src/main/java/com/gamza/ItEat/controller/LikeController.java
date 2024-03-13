@@ -18,7 +18,7 @@ public class LikeController {
     private final LikeService likeService;
 
     @Operation(summary = "게시글 좋아요 (유저 권한 필요)")
-    @PostMapping("/{id}/like")
+    @PostMapping("/like/{id}")
     public ResponseEntity<String> likePost(@RequestBody LikeDto likeDto, @PathVariable("id") Long id, HttpServletRequest request) {
         return likeService.likeService(id,likeDto,request);
     }

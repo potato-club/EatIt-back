@@ -2,11 +2,13 @@ package com.gamza.ItEat.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @Entity
+@Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class LikeEntity extends BaseTime {
