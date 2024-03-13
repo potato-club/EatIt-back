@@ -1,9 +1,6 @@
 package com.gamza.ItEat.service;
 
-import com.gamza.ItEat.dto.user.LoginRequestDto;
-import com.gamza.ItEat.dto.user.LoginResponseDto;
-import com.gamza.ItEat.dto.user.SignUpRequestDto;
-import com.gamza.ItEat.dto.user.UserUpdateRequestDto;
+import com.gamza.ItEat.dto.user.*;
 import com.gamza.ItEat.entity.UserEntity;
 import com.gamza.ItEat.enums.UserRole;
 import com.gamza.ItEat.error.ErrorCode;
@@ -18,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.Optional;
 
 import static com.gamza.ItEat.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
@@ -76,6 +74,31 @@ public class UserService {
     }
 
 
+    public UserMyPageDto viewUserInfo(HttpServletRequest request) throws IOException {
+        Optional<UserEntity> userEntityOpt = findByUserToken(request);
+
+        if (userEntityOpt.isPresent()) {
+            UserEntity userEntity = userEntityOpt.get();
+            return UserMyPageDto.builder()
+                    .email(userEntity.getEmail())
+                    .nickname(userEntity.getNickName())
+                    .build();
+        } else {
+            throw new UnAuthorizedException("404", NOT_FOUND_EXCEPTION);
+        }
+    }
+
+    public void update(UserUpdateRequestDto requestDto, HttpServletRequest request) {
+        Optional<UserEntity> userOptional = findByUserToken(request);
+        userOptional.ifPresent(user -> {
+            if (requestDto.getNickname() != null && !requestDto.getNickname().isEmpty()) {
+                user.update(requestDto);
+            }
+        });
+    }
+
+
+
     public void withdrawUser(HttpServletRequest request) {
         Optional<UserEntity> user = findByUserToken(request);
 
@@ -101,6 +124,17 @@ public class UserService {
         redisService.setValues(refreshToken, email);
     }
 
+
+    public void reissueToken(HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = jwtProvider.resolveRefreshToken(request);
+
+        String newAccessToken = jwtProvider.reissueAccessToken(refreshToken);
+        String newRefreshToken = jwtProvider.reissueRefreshToken(refreshToken);
+
+        jwtProvider.setHeaderAT(response, newAccessToken);
+        jwtProvider.setHeaderRT(response, newRefreshToken);
+    }
+
     public Optional<UserEntity> findByUserToken(HttpServletRequest request) {
         String token = jwtProvider.resolveAccessToken(request);
         String accessTokenType = jwtProvider.extractTokenType(token);
@@ -111,6 +145,8 @@ public class UserService {
 
         return token == null ? null : userRepository.findByEmail(jwtProvider.getUserEmail(token));
     }
+
+
 
 }
 
