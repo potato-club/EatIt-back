@@ -1,11 +1,13 @@
 package com.gamza.ItEat.service;
 
 import com.gamza.ItEat.dto.post.LikeDto;
+import com.gamza.ItEat.entity.CommentEntity;
 import com.gamza.ItEat.entity.LikeEntity;
 import com.gamza.ItEat.entity.PostEntity;
 import com.gamza.ItEat.entity.UserEntity;
 import com.gamza.ItEat.error.ErrorCode;
 import com.gamza.ItEat.error.exeption.NotFoundException;
+import com.gamza.ItEat.repository.CommentRepository;
 import com.gamza.ItEat.repository.LikeRepository;
 import com.gamza.ItEat.repository.PostRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,9 +25,10 @@ public class LikeService {
 
     private final LikeRepository likeRepository;
     private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
     private final UserService userService;
 
-    public ResponseEntity<String> likeService(Long postId, LikeDto likeDto, HttpServletRequest request) {
+    public ResponseEntity<String> postLikeService(Long postId, LikeDto likeDto, HttpServletRequest request) {
         Optional<UserEntity> userEntity = userService.findByUserToken(request);
         PostEntity post = postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException("잘못된 요청입니다.", ErrorCode.RUNTIME_EXCEPTION));
@@ -55,10 +58,34 @@ public class LikeService {
         return ResponseEntity.ok().body("이미 좋아요 상태입니다.");
     }
 
-    private void decreaseLikeCount(Long postId) {
-        PostEntity post = postRepository.findById(postId)
+    public ResponseEntity<String> commentLikeService(Long commentId, LikeDto likeDto, HttpServletRequest request) {
+        Optional<UserEntity> userEntity = userService.findByUserToken(request);
+        CommentEntity comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new NotFoundException("잘못된 요청입니다.", ErrorCode.RUNTIME_EXCEPTION));
-        int currentLikeCount = post.getLikesNum();
 
+        LikeEntity likeEntity = likeRepository.findByUserAndComment(userEntity.orElse(null), comment);
+
+        if (likeDto.isUnLiked()) {
+            if (likeEntity != null) {
+                likeRepository.delete(likeEntity);
+                comment.decreaseLikesNums();
+                return ResponseEntity.ok().body("좋아요가 취소되었습니다.");
+            }
+        } else {
+            if (likeEntity == null) {
+                likeEntity = LikeEntity.builder()
+                        .user(userEntity.orElse(null))
+                        .comment(comment)
+                        .isDeleted(false)
+                        .unLiked(false)
+                        .build();
+                likeRepository.save(likeEntity);
+                comment.increaseLikesNums();
+                return ResponseEntity.ok().body("좋아요가 눌렸습니다.");
+            }
+        }
+
+        return ResponseEntity.ok().body("이미 좋아요 상태입니다.");
     }
+
 }
