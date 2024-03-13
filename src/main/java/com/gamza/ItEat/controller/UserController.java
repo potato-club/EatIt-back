@@ -1,9 +1,6 @@
 package com.gamza.ItEat.controller;
 
-import com.gamza.ItEat.dto.user.LoginRequestDto;
-import com.gamza.ItEat.dto.user.LoginResponseDto;
-import com.gamza.ItEat.dto.user.SignUpRequestDto;
-import com.gamza.ItEat.dto.user.UserUpdateRequestDto;
+import com.gamza.ItEat.dto.user.*;
 import com.gamza.ItEat.service.UserService;
 import io.jsonwebtoken.io.IOException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,10 +33,29 @@ public class UserController {
         return ResponseEntity.ok("로그아웃 완료!");
     }
 
+    @PostMapping("/update")
+    public ResponseEntity<String> update(UserUpdateRequestDto dto, HttpServletRequest request) {
+        userService.update(dto, request);
+        return ResponseEntity.ok("회원 업데이트 완료!");
+    }
+
+    @GetMapping("/mypage")
+    public ResponseEntity<UserMyPageDto> getUserInfo(HttpServletRequest request) {
+        UserMyPageDto userInfo = userService.viewUserInfo(request);
+        return ResponseEntity.ok(userInfo);
+    }
+
+
     @GetMapping("/withdraw")
     public ResponseEntity<String> withdraw(HttpServletRequest request) {
         userService.withdrawUser(request);
-        return ResponseEntity.ok("회원 탈퇴 완료.");
+        return ResponseEntity.ok("회원 탈퇴 완료!");
+    }
+
+    @GetMapping("/reissue")
+    public ResponseEntity<String> reissueToken(HttpServletRequest request, HttpServletResponse response) {
+        userService.reissueToken(request, response);
+        return ResponseEntity.ok("토큰 재발급 완료!");
     }
 
 }

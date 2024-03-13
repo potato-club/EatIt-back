@@ -56,4 +56,9 @@ public class UserEntity {
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
     }
+    public void update(UserUpdateRequestDto userUpdateDto) {
+        this.nickName = userUpdateDto.getNickname();
+        this.email = userUpdateDto.getEmail();
+        this.userRole = userUpdateDto.getUserRole();
+    }
 }
