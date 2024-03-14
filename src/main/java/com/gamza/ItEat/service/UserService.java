@@ -98,7 +98,6 @@ public class UserService {
     }
 
 
-
     public void withdrawUser(HttpServletRequest request) {
         Optional<UserEntity> user = findByUserToken(request);
 
@@ -146,7 +145,4 @@ public class UserService {
         return token == null ? null : userRepository.findByEmail(jwtProvider.getUserEmail(token));
     }
 
-
-
 }
-

@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/client")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -27,7 +28,7 @@ public class UserController {
         return ResponseEntity.ok("회원가입 완료!");
     }
 
-    @PostMapping("/user/logout")
+    @PostMapping("/logout")
     public ResponseEntity<String> logout(HttpServletRequest request) {
         userService.logout(request);
         return ResponseEntity.ok("로그아웃 완료!");

@@ -16,7 +16,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommentEntity extends BaseTime{
+public class CommentEntity extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +25,7 @@ public class CommentEntity extends BaseTime{
     @Column(nullable = false)
     private String content;
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "integer default 0", nullable = false)
     private int likes;
 
     @ManyToOne
@@ -42,4 +42,18 @@ public class CommentEntity extends BaseTime{
     @ManyToOne
     @JoinColumn(name = "post_id")
     private PostEntity post;
+
+    public CommentEntity updateComment(String content) {
+        this.content = content;
+        return this;
+    }
+
+    public int increaseLikesNums() {
+        return this.likes += 1;
+    }
+
+    public int decreaseLikesNums() {
+        return this.likes -= 1;
+    }
+
 }

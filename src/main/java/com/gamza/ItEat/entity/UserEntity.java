@@ -10,7 +10,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -47,10 +49,13 @@ public class UserEntity {
     @JoinColumn(name = "post_id")
     private PostEntity posts;
 
-    @ElementCollection(targetClass = Tag.class)
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private List<Tag> tags;
+    @ManyToMany
+    @JoinTable(
+            name = "user_tags",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private Set<TagEntity> tags;
 
 
     public void setDeleted(boolean deleted) {
