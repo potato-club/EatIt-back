@@ -1,5 +1,6 @@
 package com.gamza.ItEat.entity;
 
+import com.gamza.ItEat.dto.user.UserUpdateRequestDto;
 import com.gamza.ItEat.enums.Tag;
 import com.gamza.ItEat.enums.UserRole;
 import jakarta.persistence.*;
@@ -56,4 +57,13 @@ public class UserEntity {
     )
     private Set<TagEntity> tags;
 
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+    public void update(UserUpdateRequestDto userUpdateDto) {
+        this.nickName = userUpdateDto.getNickname();
+        this.email = userUpdateDto.getEmail();
+        this.userRole = userUpdateDto.getUserRole();
+    }
 }

@@ -1,6 +1,8 @@
 package com.gamza.ItEat.jwt;
 
 import com.gamza.ItEat.enums.UserRole;
+import com.gamza.ItEat.error.ErrorCode;
+import com.gamza.ItEat.error.exeption.ForbiddenException;
 import com.gamza.ItEat.repository.UserRepository;
 import com.gamza.ItEat.service.jwt.CustomUserDetailService;
 import com.gamza.ItEat.service.jwt.RedisService;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
+import java.util.Objects;
 
 @Slf4j
 @Component
@@ -82,6 +85,29 @@ public class JwtProvider {
         return jwtParser.parseClaimsJws(token).getBody().getSubject();
     }
 
+
+    public String reissueAccessToken(String refreshToken) {
+        String email = redisService.getValues(refreshToken).get("email");
+        if (Objects.isNull(email)) {
+            throw new ForbiddenException("401", ErrorCode.ACCESS_DENIED_EXCEPTION);
+        }
+
+        return createAccessToken(email, userRepository.findByEmail(email).get().getUserRole());
+    }
+
+    public String reissueRefreshToken(String refreshToken) {
+        String email = redisService.getValues(refreshToken).get("email");
+        if (Objects.isNull(email)) {
+            throw new ForbiddenException("401", ErrorCode.ACCESS_DENIED_EXCEPTION);
+        }
+
+        String newRefreshToken = createRefreshToken(email, userRepository.findByEmail(email).get().getUserRole());
+
+        redisService.delValues(refreshToken);
+        redisService.setValues(newRefreshToken, email);
+
+        return newRefreshToken;
+    }
 
     public String resolveAccessToken(HttpServletRequest request) {
         if (request.getHeader("authorization") != null)

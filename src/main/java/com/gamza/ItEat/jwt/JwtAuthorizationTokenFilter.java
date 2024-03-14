@@ -8,8 +8,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-
-
 import org.json.JSONObject;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -51,17 +49,19 @@ public class JwtAuthorizationTokenFilter extends OncePerRequestFilter {
             } else if (accessToken == null) {
                 filterChain.doFilter(request, response);
                 return;
-            } else {
-                if (jwtProvider.validateToken(accessToken) && !redisService.isTokenInBlacklist(accessToken)) {
-                    this.setAuthentication(accessToken);
-                }
+            } else if (jwtProvider.validateToken(accessToken) && !redisService.isTokenInBlacklist(accessToken)) {
+                this.setAuthentication(accessToken);
             }
         } catch (MalformedJwtException e) {
             errorCode = ErrorJwtCode.INVALID_JWT_TOKEN;
             setResponse(response, errorCode);
             return;
         } catch (ExpiredJwtException e) {
-            errorCode = ErrorJwtCode.JWT_TOKEN_EXPIRED;
+            if (accessToken != null) {
+                errorCode = ErrorJwtCode.ACCESS_TOKEN_EXPIRED;
+            } else {
+                errorCode = ErrorJwtCode.REFRESH_TOKEN_EXPIRED;
+            }
             setResponse(response, errorCode);
             return;
         } catch (UnsupportedJwtException e) {
@@ -86,6 +86,7 @@ public class JwtAuthorizationTokenFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    //인증 실패 시 클라이언트에게 응답을 전달
     private void setResponse(HttpServletResponse response, ErrorJwtCode errorCode) throws IOException {
         JSONObject json = new JSONObject();
         response.setContentType("application/json;charset=UTF-8");
