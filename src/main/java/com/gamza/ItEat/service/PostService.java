@@ -5,6 +5,7 @@ import com.gamza.ItEat.entity.CategoryEntity;
 import com.gamza.ItEat.entity.PostEntity;
 import com.gamza.ItEat.entity.TagEntity;
 import com.gamza.ItEat.entity.UserEntity;
+import com.gamza.ItEat.enums.TagName;
 import com.gamza.ItEat.enums.UserRole;
 import com.gamza.ItEat.error.ErrorCode;
 import com.gamza.ItEat.error.exeption.BadRequestException;
@@ -20,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,7 +70,6 @@ public class PostService {
     }
 
     public List<ResponsePostDto> findAllPostByLogic(Long lastPostId, int size) { // 좋아요순으로 변경하도록 추가
-
 
         PageRequest pageRequest = PageRequest.of(0, size);
         Page<PostEntity> entityPage = postRepository.findByIdLessThanOrderByIdDesc(lastPostId, pageRequest);
@@ -211,6 +210,13 @@ public class PostService {
     public PostEntity getPostId(Long postId) {
         return postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException("게시물이 존재하지 않습니다.", ErrorCode.NOT_FOUND_EXCEPTION));
+    }
+
+    public List<TagName> getAllTagsId() {
+        List<TagEntity> allTagsName = tagRepository.findAll();
+        return allTagsName.stream()
+                .map(TagEntity::getTag)
+                .collect(Collectors.toList());
     }
 
 

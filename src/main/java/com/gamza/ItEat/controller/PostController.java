@@ -1,6 +1,7 @@
 package com.gamza.ItEat.controller;
 
 import com.gamza.ItEat.dto.post.*;
+import com.gamza.ItEat.enums.TagName;
 import com.gamza.ItEat.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -77,6 +78,12 @@ public class PostController {
     @GetMapping("/{id}")
     public int getPostViews(@PathVariable("id") Long id) {
         return postService.getPostViews(id);
+    }
+
+    @Operation(summary = "모든 태그 반환 API")
+    @GetMapping("/tag")
+    public List<TagName> getAllTags() {
+        return postService.getAllTagsId();
     }
 
 }
