@@ -25,6 +25,7 @@ public class ResponseValue {
                     .content(postEntity.getContent())
                     .views(postEntity.getViews())
                     .categoryName(postEntity.getCategory().getCategoryName())
+                    .commentNums(postEntity.getCommentsNum())
                     .createdAt(postEntity.getCreatedAt())
                     .updatedAt(postEntity.getModifiedAt())
                     .build();
