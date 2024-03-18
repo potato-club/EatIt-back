@@ -74,7 +74,7 @@ public class PostController {
         return ResponseEntity.ok().body("게시물이 삭제되었습니다.");
     }
 
-    @Operation(summary = "게시물 조회수 조회")
+    @Operation(summary = "게시물 조회수 조회") // 이거는 그냥 게시물 조회에 넣어야하는건가?
     @GetMapping("/{id}")
     public int getPostViews(@PathVariable("id") Long id) {
         return postService.getPostViews(id);

@@ -5,10 +5,17 @@ import com.gamza.ItEat.dto.post.ResponsePostDto;
 import com.gamza.ItEat.entity.PostEntity;
 import com.gamza.ItEat.error.ErrorCode;
 import com.gamza.ItEat.error.exeption.BadRequestException;
+import com.gamza.ItEat.error.exeption.NotFoundException;
+import com.gamza.ItEat.repository.PostRepository;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import java.util.Optional;
 
+@RequiredArgsConstructor
 public class ResponseValue {
+
+    private final PostRepository postRepository;
 
     public static ResponsePostDto getAllBuild(PostEntity postEntity) {
         if (postEntity != null) {
@@ -33,9 +40,9 @@ public class ResponseValue {
                     .title(postEntity.getTitle())
                     .content(postEntity.getContent())
                     .views(postEntity.getViews())
+                    .commentNums(postEntity.getCommentsNum())
                     .categoryName(postEntity.getCategory().getCategoryName())
                     .createdAt(postEntity.getCreatedAt())
-//                    .updatedAt(postEntity.getModifiedAt())
                     .build();
         } else {
             throw new BadRequestException("존재하는 게시물이 없습니다!", ErrorCode.RUNTIME_EXCEPTION);
@@ -50,5 +57,6 @@ public class ResponseValue {
                 .categoryList(categoryList)
                 .build();
     }
+
 }
 

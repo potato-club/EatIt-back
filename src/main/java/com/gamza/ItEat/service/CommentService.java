@@ -62,12 +62,15 @@ public class CommentService {
         } else {
             PostEntity post = postService.getPostId(postId);
 
+            postService.addCommentNums(postId);
+
             CommentEntity comment = CommentEntity.builder()
                     .content(dto.getContent())
                     .post(post)
                     .user(user.get())
                     .build();
             CommentEntity save = commentRepository.save(comment);
+
             return new CommentResponseDto(save);
         }
     }
