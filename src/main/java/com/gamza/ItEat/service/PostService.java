@@ -36,7 +36,6 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final CategoryRepository categoryRepository;
-    private final CommentRepository commentRepository;
     private final TagRepository tagRepository;
     private final UserService userService;
 
@@ -219,10 +218,15 @@ public class PostService {
         }
     }
 
-    public int getCommentViews(Long postId) {
-        PostEntity id = postRepository.findById(postId)
-                .orElseThrow(() -> new NotFoundException("게시물이 존재하지 않습니다.", ErrorCode.NOT_FOUND_EXCEPTION));
-        return id.getCommentsNum();
+    public void deleteCommentNums(Long id) {
+        Optional<PostEntity> post = postRepository.findById(id);
+        if (post.isPresent()) {
+            PostEntity postEntity = post.get();
+            postEntity.decreaseCommentNums();
+            postRepository.save(postEntity);
+        } else {
+            throw new NotFoundException("잘못된 접근입니다.", ErrorCode.ACCESS_DENIED_EXCEPTION);
+        }
     }
 
     public PostEntity getPostId(Long postId) {
