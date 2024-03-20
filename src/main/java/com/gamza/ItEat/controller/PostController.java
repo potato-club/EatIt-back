@@ -82,7 +82,7 @@ public class PostController {
 
     @Operation(summary = "모든 태그 반환 API")
     @GetMapping("/tag")
-    public List<TagName> getAllTags() {
+    public List<TagInfoDto> getAllTags() {
         return postService.getAllTagsId();
     }
 

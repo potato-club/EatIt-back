@@ -234,10 +234,10 @@ public class PostService {
                 .orElseThrow(() -> new NotFoundException("게시물이 존재하지 않습니다.", ErrorCode.NOT_FOUND_EXCEPTION));
     }
 
-    public List<TagName> getAllTagsId() {
+    public List<TagInfoDto> getAllTagsId() {
         List<TagEntity> allTagsName = tagRepository.findAll();
         return allTagsName.stream()
-                .map(TagEntity::getTag)
+                .map(tag -> new TagInfoDto(tag.getId(),tag.getTag()))
                 .collect(Collectors.toList());
     }
 
