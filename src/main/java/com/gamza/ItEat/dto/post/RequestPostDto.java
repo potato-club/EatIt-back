@@ -1,7 +1,7 @@
 package com.gamza.ItEat.dto.post;
 
 import com.gamza.ItEat.enums.CategoryName;
-import com.gamza.ItEat.enums.Tag;
+import com.gamza.ItEat.enums.TagName;
 import lombok.Getter;
 
 import java.util.List;
@@ -11,5 +11,5 @@ public class RequestPostDto {
     private String title;
     private String content;
     private CategoryName categoryName;
-    private List<Tag> tags;
+    private List<TagName> tags;
 }

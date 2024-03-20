@@ -1,7 +1,6 @@
 package com.gamza.ItEat.entity;
 
 import com.gamza.ItEat.dto.user.UserUpdateRequestDto;
-import com.gamza.ItEat.enums.Tag;
 import com.gamza.ItEat.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -10,8 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
