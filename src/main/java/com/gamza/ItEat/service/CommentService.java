@@ -61,6 +61,7 @@ public class CommentService {
             throw new UnAuthorizedException("로그인후 이용해주세요.", ErrorCode.NOT_ALLOW_WRITE_EXCEPTION);
         } else {
             PostEntity post = postService.getPostId(postId);
+            postService.addCommentNums(postId);
 
             CommentEntity comment = CommentEntity.builder()
                     .content(dto.getContent())
@@ -68,6 +69,7 @@ public class CommentService {
                     .user(user.get())
                     .build();
             CommentEntity save = commentRepository.save(comment);
+
             return new CommentResponseDto(save);
         }
     }
@@ -97,13 +99,11 @@ public class CommentService {
             CommentEntity commentId = commentRepository.findById(id)
                     .orElseThrow(() -> new NotFoundException("댓글이 존재하지않습니다.", ErrorCode.NOT_FOUND_EXCEPTION));
 
+            postService.deleteCommentNums(id);
+
             commentRepository.deleteById(commentId.getId());
         }
 
     }
 
-    public CommentEntity findCommentId(Long commentId) {
-        return commentRepository.findById(commentId)
-                .orElseThrow(() -> new NotFoundException("댓글이 존재하지 않습니다.", ErrorCode.NOT_FOUND_EXCEPTION));
-    }
 }

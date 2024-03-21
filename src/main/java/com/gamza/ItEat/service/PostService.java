@@ -5,12 +5,14 @@ import com.gamza.ItEat.entity.CategoryEntity;
 import com.gamza.ItEat.entity.PostEntity;
 import com.gamza.ItEat.entity.TagEntity;
 import com.gamza.ItEat.entity.UserEntity;
+import com.gamza.ItEat.enums.TagName;
 import com.gamza.ItEat.enums.UserRole;
 import com.gamza.ItEat.error.ErrorCode;
 import com.gamza.ItEat.error.exeption.BadRequestException;
 import com.gamza.ItEat.error.exeption.NotFoundException;
 import com.gamza.ItEat.error.exeption.UnAuthorizedException;
 import com.gamza.ItEat.repository.CategoryRepository;
+import com.gamza.ItEat.repository.CommentRepository;
 import com.gamza.ItEat.repository.PostRepository;
 import com.gamza.ItEat.repository.TagRepository;
 import com.gamza.ItEat.utils.ResponseValue;
@@ -20,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,7 +44,6 @@ public class PostService {
         PostEntity post = postOptional.orElseThrow(() -> new NoSuchElementException("게시물이 존재하지 않습니다."));
         addPostView(id);
         return ResponseValue.getOneBuild(post);
-
     }
 
     public ResponsePostListDto findAllPost() {
@@ -71,12 +71,11 @@ public class PostService {
 
     public List<ResponsePostDto> findAllPostByLogic(Long lastPostId, int size) { // 좋아요순으로 변경하도록 추가
 
-
         PageRequest pageRequest = PageRequest.of(0, size);
         Page<PostEntity> entityPage = postRepository.findByIdLessThanOrderByIdDesc(lastPostId, pageRequest);
         List<PostEntity> postEntityList = postRepository.findAllOrderByLikesDesc();
 
-        List<ResponsePostDto> responsePostDtos  = postEntityList.stream()
+        List<ResponsePostDto> responsePostDtos = postEntityList.stream()
                 .map(postEntity -> ResponsePostDto.builder()
                         .id(postEntity.getId())
                         .createdAt(postEntity.getCreatedAt())
@@ -134,8 +133,8 @@ public class PostService {
             List<TagEntity> tags = tagRepository.findByTagIn(requestDto.getTags());
             Set<TagEntity> distinctTags = new HashSet<>(tags);
 
-            if(distinctTags.size() > 5){
-                throw new BadRequestException("태그는 5개까지만 가능합니다.",ErrorCode.NOT_FOUND_EXCEPTION);
+            if (distinctTags.size() > 5) {
+                throw new BadRequestException("태그는 5개까지만 가능합니다.", ErrorCode.NOT_FOUND_EXCEPTION);
             }
 
             if (category == null) {
@@ -200,9 +199,31 @@ public class PostService {
 
     public int getPostViews(Long id) {
         Optional<PostEntity> post = postRepository.findById(id);
-        if(post.isPresent()) {
+        if (post.isPresent()) {
             int postEntity = post.get().getViews();
             return postEntity;
+        } else {
+            throw new NotFoundException("잘못된 접근입니다.", ErrorCode.ACCESS_DENIED_EXCEPTION);
+        }
+    }
+
+    public void addCommentNums(Long id) {
+        Optional<PostEntity> post = postRepository.findById(id);
+        if (post.isPresent()) {
+            PostEntity postEntity = post.get();
+            postEntity.increaseCommentNums();
+            postRepository.save(postEntity);
+        } else {
+            throw new NotFoundException("잘못된 접근입니다.", ErrorCode.ACCESS_DENIED_EXCEPTION);
+        }
+    }
+
+    public void deleteCommentNums(Long id) {
+        Optional<PostEntity> post = postRepository.findById(id);
+        if (post.isPresent()) {
+            PostEntity postEntity = post.get();
+            postEntity.decreaseCommentNums();
+            postRepository.save(postEntity);
         } else {
             throw new NotFoundException("잘못된 접근입니다.", ErrorCode.ACCESS_DENIED_EXCEPTION);
         }
@@ -211,6 +232,13 @@ public class PostService {
     public PostEntity getPostId(Long postId) {
         return postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException("게시물이 존재하지 않습니다.", ErrorCode.NOT_FOUND_EXCEPTION));
+    }
+
+    public List<TagInfoDto> getAllTagsId() {
+        List<TagEntity> allTagsName = tagRepository.findAll();
+        return allTagsName.stream()
+                .map(tag -> new TagInfoDto(tag.getId(),tag.getTag()))
+                .collect(Collectors.toList());
     }
 
 

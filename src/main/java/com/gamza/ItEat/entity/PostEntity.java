@@ -9,7 +9,6 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -64,6 +63,14 @@ public class PostEntity extends BaseTime {
         this.title = title;
         this.content = content;
         return this;
+    }
+
+    public int increaseCommentNums() {
+        return this.commentsNum += 1;
+    }
+
+    public int decreaseCommentNums() {
+        return this.commentsNum -= 1;
     }
 
     public int increaseLikesNums() {

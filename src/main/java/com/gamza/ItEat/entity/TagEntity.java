@@ -1,6 +1,6 @@
 package com.gamza.ItEat.entity;
 
-import com.gamza.ItEat.enums.Tag;
+import com.gamza.ItEat.enums.TagName;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,6 +24,6 @@ public class TagEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tag_name")
-    private Tag tag;
+    private TagName tag;
 
 }
