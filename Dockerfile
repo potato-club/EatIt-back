@@ -4,7 +4,8 @@
 
 FROM openjdk:17-jdk AS build
 WORKDIR /tmp
-COPY . /tmp
+COPY .. /tmp
+RUN apt-get update && apt-get install -y findutils
 RUN chmod +x ./gradlew && ./gradlew clean bootJar
 
 # 생성한 jar 파일을 실행함.
