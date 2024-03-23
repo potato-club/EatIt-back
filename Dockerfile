@@ -4,7 +4,7 @@
 
 FROM openjdk:17-jdk AS build
 WORKDIR /tmp
-COPY .. /tmp
+COPY . /tmp
 RUN chmod +x ./gradlew && ./gradlew clean bootJar
 
 # 생성한 jar 파일을 실행함.
