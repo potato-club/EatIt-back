@@ -1,9 +1,11 @@
 package com.gamza.ItEat.service;
 
 import com.gamza.ItEat.dto.post.PaginationDto;
+import com.gamza.ItEat.dto.post.ResponsePostDto;
 import com.gamza.ItEat.entity.PostEntity;
 import com.gamza.ItEat.enums.TagName;
 import com.gamza.ItEat.repository.PostRepository;
+import com.gamza.ItEat.repository.custom.PostRepositoryCustom;
 import com.gamza.ItEat.utils.ResponseValue;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 public class SearchService {
 
     private final PostRepository postRepository;
+    private final PostRepositoryCustom postRepositoryCustom;
 
     public PaginationDto searchPostByTags(List<TagName> tags, Pageable pageable) {
         List<Long> ids = postRepositoryCustom.findPostIdsByTags(tags); // 태그가 있는 게시물 id값들 반환
