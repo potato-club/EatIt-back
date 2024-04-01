@@ -54,8 +54,11 @@ public class UserEntity {
     )
     private Set<TagEntity> tags;
 
+    @ManyToOne(fetch = FetchType.LAZY) // 이런식으로 관계설정을 하면 되려나?
+    @JoinColumn(name = "subscribe")
+    private PostEntity subscribePost;
 
-    public void setDeleted(boolean deleted) {
+    public void setDeleted(boolean deleted) { // 아니 이거 여기도있네 왜여기씀
         this.deleted = deleted;
     }
     public void update(UserUpdateRequestDto userUpdateDto) {

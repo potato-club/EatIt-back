@@ -86,4 +86,8 @@ public class PostController {
         return postService.getAllTagsId();
     }
 
+//    @Operation(summary = "게시물 즐겨찾기 (유저권한 필요)")
+//    @PostMapping("/subscribe")
+
+
 }
