@@ -1,19 +1,15 @@
 package com.gamza.ItEat.service;
 
 import com.gamza.ItEat.dto.post.*;
-import com.gamza.ItEat.entity.CategoryEntity;
-import com.gamza.ItEat.entity.PostEntity;
-import com.gamza.ItEat.entity.TagEntity;
-import com.gamza.ItEat.entity.UserEntity;
-import com.gamza.ItEat.enums.TagName;
+import com.gamza.ItEat.entity.*;
 import com.gamza.ItEat.enums.UserRole;
 import com.gamza.ItEat.error.ErrorCode;
 import com.gamza.ItEat.error.exeption.BadRequestException;
 import com.gamza.ItEat.error.exeption.NotFoundException;
 import com.gamza.ItEat.error.exeption.UnAuthorizedException;
 import com.gamza.ItEat.repository.CategoryRepository;
-import com.gamza.ItEat.repository.CommentRepository;
 import com.gamza.ItEat.repository.PostRepository;
+import com.gamza.ItEat.repository.SubscribeRepository;
 import com.gamza.ItEat.repository.TagRepository;
 import com.gamza.ItEat.utils.ResponseValue;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +34,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final CategoryRepository categoryRepository;
     private final TagRepository tagRepository;
+    private final SubscribeRepository subscribeRepository;
     private final UserService userService;
 
     public ResponsePostDto findOnePost(Long id) {
@@ -237,8 +235,42 @@ public class PostService {
     public List<TagInfoDto> getAllTagsId() {
         List<TagEntity> allTagsName = tagRepository.findAll();
         return allTagsName.stream()
-                .map(tag -> new TagInfoDto(tag.getId(),tag.getTag()))
+                .map(tag -> new TagInfoDto(tag.getId(), tag.getTag()))
                 .collect(Collectors.toList());
+    }
+
+    public ResponseEntity<String> subscribePost(Long postId, SubscribeDto subscribeDto, HttpServletRequest request) {
+        Optional<UserEntity> user = userService.findByUserToken(request);
+
+        if (!user.isPresent()) {
+            throw new BadRequestException("유저를 찾을 수 없습니다.", ErrorCode.NOT_FOUND_EXCEPTION);
+        }
+        PostEntity post = postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException("게시물을 찾을 수 없습니다.", ErrorCode.NOT_FOUND_EXCEPTION));
+
+        SubscribeEntity subscribeEntity = subscribeRepository.findByUserAndPost(user.orElse(null), post);
+
+        if(subscribeDto.isSubscribe()){
+            if(subscribeEntity != null) {
+                subscribeRepository.delete(subscribeEntity);
+                post.decreaseSubscribeNums();
+                return ResponseEntity.ok().body("즐겨찾기가 취소되었습니다.");
+            }
+        } else {
+            if(subscribeEntity == null) {
+                subscribeEntity = SubscribeEntity.builder()
+                        .user(user.orElse(null))
+                        .post(post)
+                        .subscribe(false)
+                        .build();
+                subscribeRepository.save(subscribeEntity);
+                post.increaseSubscribeNums();
+                return ResponseEntity.ok().body("즐겨찾기를 누르셨습니다.");
+            }
+        }
+
+        return ResponseEntity.ok().body("잘못된 요청입니다.");
+
     }
 
 

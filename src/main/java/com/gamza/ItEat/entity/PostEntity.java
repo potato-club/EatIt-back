@@ -48,6 +48,9 @@ public class PostEntity extends BaseTime {
     @Column(nullable = false)
     private int commentsNum;
 
+    @Column(columnDefinition = "integer default 0", nullable = false)
+    private int subscribeNum;
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<FileEntity> images = new ArrayList<>();
 
@@ -59,11 +62,24 @@ public class PostEntity extends BaseTime {
     )
     private Set<TagEntity> tags;
 
+
+
     public PostEntity updatePost(String title, String content) { // 추후 수정 내용 추가 일시적으로 제목 내용만 추가
         this.title = title;
         this.content = content;
         return this;
     }
+
+    // 이렇게 아래처럼 안하고싶은데 흠 어떻게 나중에 리팩토링을 해야할까?
+
+    public int increaseSubscribeNums() {
+        return this.subscribeNum += 1;
+    }
+
+    public int decreaseSubscribeNums() {
+        return this.subscribeNum -= 1;
+    }
+
 
     public int increaseCommentNums() {
         return this.commentsNum += 1;
