@@ -5,14 +5,12 @@ import com.gamza.ItEat.entity.CategoryEntity;
 import com.gamza.ItEat.entity.PostEntity;
 import com.gamza.ItEat.entity.TagEntity;
 import com.gamza.ItEat.entity.UserEntity;
-import com.gamza.ItEat.enums.TagName;
 import com.gamza.ItEat.enums.UserRole;
 import com.gamza.ItEat.error.ErrorCode;
 import com.gamza.ItEat.error.exeption.BadRequestException;
 import com.gamza.ItEat.error.exeption.NotFoundException;
 import com.gamza.ItEat.error.exeption.UnAuthorizedException;
 import com.gamza.ItEat.repository.CategoryRepository;
-import com.gamza.ItEat.repository.CommentRepository;
 import com.gamza.ItEat.repository.PostRepository;
 import com.gamza.ItEat.repository.TagRepository;
 import com.gamza.ItEat.utils.ResponseValue;
@@ -22,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -237,11 +236,45 @@ public class PostService {
     public List<TagInfoDto> getAllTagsId() {
         List<TagEntity> allTagsName = tagRepository.findAll();
         return allTagsName.stream()
-                .map(tag -> new TagInfoDto(tag.getId(),tag.getTag()))
+                .map(tag -> new TagInfoDto(tag.getId(), tag.getTag()))
                 .collect(Collectors.toList());
     }
 
+    public ResponseEntity<String> subscribePost(Long postId, SubscribeDto subscribeDto, HttpServletRequest request) {
+        Optional<UserEntity> user = userService.findByUserToken(request);
 
+        if (!user.isPresent()) {
+            throw new BadRequestException("유저를 찾을 수 없습니다.", ErrorCode.NOT_FOUND_EXCEPTION);
+        }
+        PostEntity post = postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException("게시물을 찾을 수 없습니다.", ErrorCode.NOT_FOUND_EXCEPTION));
+
+        boolean currentPostSubscribe = post.isSubscribe(); // true면 구독됨 false면 구독안됨
+
+        // dto로 true -> 이미 true야 그러면 구독이 된상태입니다.
+        // dto로 true -> false상태야 그러면 구독이 되었습니다.
+        // dto로 false -> true상태야 그러면 구독이 취소되었습니다.
+        // dto로 false -> false상태야 잘못된 요청입니다.
+
+
+        if (currentPostSubscribe) {
+            if (subscribeDto.isSubscribe()) {
+                return ResponseEntity.ok().body("이미 구독상태입니다.");
+            } else {
+                post.changeSubscribe(false);
+                postRepository.save(post);
+                return ResponseEntity.ok().body("구독이 취소되었습니다.");
+            }
+        } else {
+            if (subscribeDto.isSubscribe()) {
+                post.changeSubscribe(true);
+                postRepository.save(post);
+                return ResponseEntity.ok().body("구독을 누르셨습니다.");
+            } else {
+                return ResponseEntity.ok().body("잘못된 요청입니다.");
+            }
+        }
+    }
 
 
 }

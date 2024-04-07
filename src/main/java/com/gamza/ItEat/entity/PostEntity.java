@@ -68,6 +68,13 @@ public class PostEntity extends BaseTime {
         return this;
     }
 
+    // 이렇게 아래처럼 안하고싶은데 흠 어떻게 나중에 리팩토링을 해야할까?
+
+    public boolean changeSubscribe(boolean status) {
+        return this.subscribe = status;
+    }
+
+
     public int increaseCommentNums() {
         return this.commentsNum += 1;
     }
