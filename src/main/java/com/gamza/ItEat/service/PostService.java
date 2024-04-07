@@ -1,10 +1,7 @@
 package com.gamza.ItEat.service;
 
 import com.gamza.ItEat.dto.post.*;
-import com.gamza.ItEat.entity.CategoryEntity;
-import com.gamza.ItEat.entity.PostEntity;
-import com.gamza.ItEat.entity.TagEntity;
-import com.gamza.ItEat.entity.UserEntity;
+import com.gamza.ItEat.entity.*;
 import com.gamza.ItEat.enums.UserRole;
 import com.gamza.ItEat.error.ErrorCode;
 import com.gamza.ItEat.error.exeption.BadRequestException;
@@ -12,6 +9,7 @@ import com.gamza.ItEat.error.exeption.NotFoundException;
 import com.gamza.ItEat.error.exeption.UnAuthorizedException;
 import com.gamza.ItEat.repository.CategoryRepository;
 import com.gamza.ItEat.repository.PostRepository;
+import com.gamza.ItEat.repository.SubscribeRepository;
 import com.gamza.ItEat.repository.TagRepository;
 import com.gamza.ItEat.utils.ResponseValue;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,6 +34,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final CategoryRepository categoryRepository;
     private final TagRepository tagRepository;
+    private final SubscribeRepository subscribeRepository;
     private final UserService userService;
 
     public ResponsePostDto findOnePost(Long id) {
@@ -249,25 +248,29 @@ public class PostService {
         PostEntity post = postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException("게시물을 찾을 수 없습니다.", ErrorCode.NOT_FOUND_EXCEPTION));
 
-        boolean currentPostSubscribe = post.isSubscribe();
+        SubscribeEntity subscribeEntity = subscribeRepository.findByUserAndPost(user.orElse(null), post);
 
-        if (currentPostSubscribe) {
-            if (subscribeDto.isSubscribe()) {
-                return ResponseEntity.ok().body("이미 구독상태입니다.");
-            } else {
-                post.changeSubscribe(false);
-                postRepository.save(post);
-                return ResponseEntity.ok().body("구독이 취소되었습니다.");
+        if(subscribeDto.isSubscribe()){
+            if(subscribeEntity != null) {
+                subscribeRepository.delete(subscribeEntity);
+                post.decreaseSubscribeNums();
+                return ResponseEntity.ok().body("즐겨찾기가 취소되었습니다.");
             }
         } else {
-            if (subscribeDto.isSubscribe()) {
-                post.changeSubscribe(true);
-                postRepository.save(post);
-                return ResponseEntity.ok().body("구독을 누르셨습니다.");
-            } else {
-                return ResponseEntity.ok().body("잘못된 요청입니다.");
+            if(subscribeEntity == null) {
+                subscribeEntity = SubscribeEntity.builder()
+                        .user(user.orElse(null))
+                        .post(post)
+                        .subscribe(false)
+                        .build();
+                subscribeRepository.save(subscribeEntity);
+                post.increaseSubscribeNums();
+                return ResponseEntity.ok().body("즐겨찾기를 누르셨습니다.");
             }
         }
+
+        return ResponseEntity.ok().body("잘못된 요청입니다.");
+
     }
 
 
