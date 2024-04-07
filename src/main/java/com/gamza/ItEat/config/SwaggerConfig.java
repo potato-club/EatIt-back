@@ -11,12 +11,25 @@ public class SwaggerConfig {
     @Bean
     public GroupedOpenApi postApi() {
         Info info = new Info().title("게시물 관련 API").version("v0.1");
-        String[] paths = {"/post/**"};
+        String[] paths = {"/post/**", "/search"};
 
         return GroupedOpenApi.builder()
                 .group("post")
                 .pathsToMatch(paths)
                 .displayName("Post's API")
+                .addOpenApiCustomizer(api -> api.setInfo(info))
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi likeApi() {
+        Info info = new Info().title("좋아요 관련 API").version("v0.1");
+        String[] paths = {"/like/**"};
+
+        return GroupedOpenApi.builder()
+                .group("like")
+                .pathsToMatch(paths)
+                .displayName("Like's API")
                 .addOpenApiCustomizer(api -> api.setInfo(info))
                 .build();
     }
