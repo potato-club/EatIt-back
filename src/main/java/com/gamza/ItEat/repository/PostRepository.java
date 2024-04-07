@@ -22,4 +22,6 @@ public interface PostRepository extends JpaRepository<PostEntity, Long> {
     List<PostEntity> findTop5ByOrderByCreatedAtDesc();
     Page<PostEntity> findByIdLessThanOrderByIdDesc(Long lastPostId, PageRequest pageRequest);  // 나중에 바꿔야겠는데 조회순, 추천순으로
 
+    Page<PostEntity> findByIdIn(List<Long> ids, Pageable pageable);
+
 }
