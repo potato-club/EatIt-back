@@ -1,6 +1,7 @@
 package com.gamza.ItEat.service;
 
 import com.gamza.ItEat.dto.post.LikeDto;
+import com.gamza.ItEat.dto.post.SubscribeDto;
 import com.gamza.ItEat.entity.CommentEntity;
 import com.gamza.ItEat.entity.LikeEntity;
 import com.gamza.ItEat.entity.PostEntity;
@@ -57,6 +58,7 @@ public class LikeService {
 
         return ResponseEntity.ok().body("이미 좋아요 상태입니다.");
     }
+
 
     public ResponseEntity<String> commentLikeService(Long commentId, LikeDto likeDto, HttpServletRequest request) {
         Optional<UserEntity> userEntity = userService.findByUserToken(request);

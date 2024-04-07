@@ -249,13 +249,7 @@ public class PostService {
         PostEntity post = postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException("게시물을 찾을 수 없습니다.", ErrorCode.NOT_FOUND_EXCEPTION));
 
-        boolean currentPostSubscribe = post.isSubscribe(); // true면 구독됨 false면 구독안됨
-
-        // dto로 true -> 이미 true야 그러면 구독이 된상태입니다.
-        // dto로 true -> false상태야 그러면 구독이 되었습니다.
-        // dto로 false -> true상태야 그러면 구독이 취소되었습니다.
-        // dto로 false -> false상태야 잘못된 요청입니다.
-
+        boolean currentPostSubscribe = post.isSubscribe();
 
         if (currentPostSubscribe) {
             if (subscribeDto.isSubscribe()) {
