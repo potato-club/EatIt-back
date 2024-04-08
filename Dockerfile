@@ -10,6 +10,4 @@ RUN chmod +x ./gradlew
 RUN microdnf install -y findutils
 RUN ./gradlew bootJar
 
-RUN ls /app/build/libs
-
-ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} -jar /app/build/libs/ItEat-0.0.1-SNAPSHOT-plain.jar"]
+ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} -jar /app/build/libs/ItEat-0.0.1-SNAPSHOT.jar"]
