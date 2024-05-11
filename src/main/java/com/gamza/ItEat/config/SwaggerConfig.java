@@ -9,6 +9,18 @@ import org.springframework.context.annotation.Configuration;
 public class SwaggerConfig {
 
     @Bean
+    public GroupedOpenApi AllApi() {
+        Info info = new Info().title("모든 API").version("v0.1");
+
+        return GroupedOpenApi.builder()
+                .group("all")
+                .pathsToMatch("/**")
+                .displayName("All API")
+                .addOpenApiCustomizer(api -> api.setInfo(info))
+                .build();
+    }
+
+    @Bean
     public GroupedOpenApi postApi() {
         Info info = new Info().title("게시물 관련 API").version("v0.1");
         String[] paths = {"/post/**", "/search"};
