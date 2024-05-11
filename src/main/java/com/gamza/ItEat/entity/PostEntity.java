@@ -54,6 +54,8 @@ public class PostEntity extends BaseTime {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<FileEntity> images = new ArrayList<>();
 
+    private boolean mentor;
+
     @ManyToMany
     @JoinTable(
             name = "post_tags",

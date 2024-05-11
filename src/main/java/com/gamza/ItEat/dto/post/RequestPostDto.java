@@ -12,4 +12,5 @@ public class RequestPostDto {
     private String content;
     private CategoryName categoryName;
     private List<TagName> tags;
+    private boolean mentor;
 }

@@ -144,6 +144,7 @@ public class PostService {
                     .content(requestDto.getContent())
                     .tags(distinctTags)
                     .category(category)
+                    .mentor(requestDto.isMentor()) // true = mentor , false = mentee
                     .build();
             PostEntity savedPost = postRepository.save(post); // 게시물 저장하고
 
