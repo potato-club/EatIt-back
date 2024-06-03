@@ -3,6 +3,7 @@ package com.gamza.ItEat.service;
 import com.gamza.ItEat.dto.post.*;
 import com.gamza.ItEat.entity.*;
 import com.gamza.ItEat.enums.CategoryName;
+import com.gamza.ItEat.enums.TagName;
 import com.gamza.ItEat.enums.UserRole;
 import com.gamza.ItEat.error.ErrorCode;
 import com.gamza.ItEat.error.exeption.BadRequestException;
@@ -163,17 +164,20 @@ public class PostService {
                     orElseThrow(() -> new BadRequestException("게시물이 존재하지 않습니다.", ErrorCode.RUNTIME_EXCEPTION)); // 오류 출력 게시물 없을떄 따로하나 만들어야겠다.
 
             CategoryName updatedCategory = updatePostDto.getCategory();
-//            CategoryName categoryName = categoryRepository.findByCategoryName(updatedCategory);
             CategoryEntity newCategory = categoryRepository.findByCategoryName(updatedCategory);
 
             if (newCategory == null) {
                 throw new NotFoundException("카테고리를 찾을 수 없습니다.", ErrorCode.NOT_FOUND_EXCEPTION);
             }
 
+            List<TagName> updatedTag = updatePostDto.getTags();
+            List<TagEntity> updatedTags = tagRepository.findByTagIn(updatedTag);
+            Set<TagEntity> distinctTags = new HashSet<>(updatedTags);
+
             String updatedTitle = updatePostDto.getTitle();
             String updatedContent = updatePostDto.getContent();
 
-            originPost.updatePost(updatedTitle, updatedContent, newCategory);
+            originPost.updatePost(updatedTitle, updatedContent, newCategory, distinctTags);
             return postRepository.save(originPost).getId();
         }
     }

@@ -66,10 +66,11 @@ public class PostEntity extends BaseTime {
     private Set<TagEntity> tags;
 
 
-    public PostEntity updatePost(String title, String content, CategoryEntity category) {
+    public PostEntity updatePost(String title, String content, CategoryEntity category, Set<TagEntity> tags) {
         this.title = title;
         this.content = content;
         this.category = category;
+        this.tags = tags;
         return this;
     }
 
