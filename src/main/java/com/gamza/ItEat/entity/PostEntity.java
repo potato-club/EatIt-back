@@ -1,5 +1,6 @@
 package com.gamza.ItEat.entity;
 
+import com.gamza.ItEat.enums.CategoryName;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -65,10 +66,10 @@ public class PostEntity extends BaseTime {
     private Set<TagEntity> tags;
 
 
-
-    public PostEntity updatePost(String title, String content) { // 추후 수정 내용 추가 일시적으로 제목 내용만 추가
+    public PostEntity updatePost(String title, String content, CategoryEntity category) {
         this.title = title;
         this.content = content;
+        this.category = category;
         return this;
     }
 
