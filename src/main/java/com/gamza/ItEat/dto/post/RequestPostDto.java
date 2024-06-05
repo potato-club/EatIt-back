@@ -17,8 +17,8 @@ public class RequestPostDto {
     private List<TagName> tags;
     private boolean mentor;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
-    private LocalDate startDate; // 모집 시작 날짜
+    private LocalDate startDate;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
-    private LocalDate endDate;   // 모집 종료 날짜
+    private LocalDate endDate;
 }

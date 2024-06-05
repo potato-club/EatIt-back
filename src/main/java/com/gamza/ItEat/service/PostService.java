@@ -84,6 +84,8 @@ public class PostService {
                         .title(postEntity.getTitle())
                         .mentor(postEntity.isMentor())
                         .content(postEntity.getContent())
+                        .startDate(postEntity.getStartDate())
+                        .endDate(postEntity.getEndDate())
                         .categoryName(postEntity.getCategory().getCategoryName())
                         .build())
                 .collect(Collectors.toList());
