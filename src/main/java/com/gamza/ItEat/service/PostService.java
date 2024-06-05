@@ -148,6 +148,8 @@ public class PostService {
                     .tags(distinctTags)
                     .category(category)
                     .mentor(requestDto.isMentor()) // true = mentor , false = mentee
+                    .startDate(requestDto.getStartDate())
+                    .endDate(requestDto.getEndDate())
                     .build();
             PostEntity savedPost = postRepository.save(post); // 게시물 저장하고
 
