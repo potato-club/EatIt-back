@@ -20,9 +20,12 @@ public class ResponseValue {
                     .content(postEntity.getContent())
                     .views(postEntity.getViews())
                     .categoryName(postEntity.getCategory().getCategoryName())
+                    .mentor(postEntity.isMentor())
                     .commentNums(postEntity.getCommentsNum())
                     .createdAt(postEntity.getCreatedAt())
                     .updatedAt(postEntity.getModifiedAt())
+                    .startDate(postEntity.getStartDate())
+                    .endDate(postEntity.getEndDate())
                     .build();
         } else {
             throw new BadRequestException("존재하는 게시물이 없습니다!", ErrorCode.RUNTIME_EXCEPTION);
@@ -37,8 +40,11 @@ public class ResponseValue {
                     .content(postEntity.getContent())
                     .views(postEntity.getViews())
                     .commentNums(postEntity.getCommentsNum())
+                    .mentor(postEntity.isMentor())
                     .categoryName(postEntity.getCategory().getCategoryName())
                     .createdAt(postEntity.getCreatedAt())
+                    .startDate(postEntity.getStartDate())
+                    .endDate(postEntity.getEndDate())
                     .build();
         } else {
             throw new BadRequestException("존재하는 게시물이 없습니다!", ErrorCode.RUNTIME_EXCEPTION);

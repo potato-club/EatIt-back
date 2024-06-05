@@ -1,5 +1,6 @@
 package com.gamza.ItEat.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gamza.ItEat.enums.CategoryName;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -56,6 +59,11 @@ public class PostEntity extends BaseTime {
     private List<FileEntity> images = new ArrayList<>();
 
     private boolean mentor;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd", timezone = "Asia/Seoul")
+    private LocalDate startDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd", timezone = "Asia/Seoul")
+    private LocalDate endDate;
 
     @ManyToMany
     @JoinTable(

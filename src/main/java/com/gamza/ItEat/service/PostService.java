@@ -82,7 +82,10 @@ public class PostService {
                         .likeNums(postEntity.getLikesNum())
                         .views(postEntity.getViews())
                         .title(postEntity.getTitle())
+                        .mentor(postEntity.isMentor())
                         .content(postEntity.getContent())
+                        .startDate(postEntity.getStartDate())
+                        .endDate(postEntity.getEndDate())
                         .categoryName(postEntity.getCategory().getCategoryName())
                         .build())
                 .collect(Collectors.toList());
@@ -147,6 +150,8 @@ public class PostService {
                     .tags(distinctTags)
                     .category(category)
                     .mentor(requestDto.isMentor()) // true = mentor , false = mentee
+                    .startDate(requestDto.getStartDate())
+                    .endDate(requestDto.getEndDate())
                     .build();
             PostEntity savedPost = postRepository.save(post); // 게시물 저장하고
 
