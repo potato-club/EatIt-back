@@ -36,14 +36,14 @@ public class PostController {
     }
 
     @Operation(summary = "카테고리별 게시물 조회")
-    @GetMapping("/{category}") // 카테고리별 게시물 조회 //
+    @GetMapping("/category/{categoryId}") // 카테고리별 게시물 조회 //
     public PaginationDto findPostByCategory(
-            @PathVariable Long category,
+            @PathVariable Long categoryId,
             @RequestParam(defaultValue = "0")
             int page,
             @RequestParam(defaultValue = "8") // 8개씩
             int size) {
-        PaginationDto allPostByParentCategory = postService.findPostByCategoryId(category, PageRequest.of(page, size));
+        PaginationDto allPostByParentCategory = postService.findPostByCategoryId(categoryId, PageRequest.of(page, size));
         return allPostByParentCategory;
     }
 

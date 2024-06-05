@@ -82,6 +82,7 @@ public class PostService {
                         .likeNums(postEntity.getLikesNum())
                         .views(postEntity.getViews())
                         .title(postEntity.getTitle())
+                        .mentor(postEntity.isMentor())
                         .content(postEntity.getContent())
                         .categoryName(postEntity.getCategory().getCategoryName())
                         .build())
