@@ -28,3 +28,8 @@ spring:
 jasypt:
   encryptor:
     bean: jasyptStringEncryptor
+
+email:
+  gmail:
+    id: ENC(DR0J+Ify50+A4JkKuXg4HNrWkcgfy4XLwofhJqpir4Y=)
+    pw: ENC(cbu0+ZLXCzeousUvSD8d8hxy93PPRmIWOONbdwKcjfk=)
