@@ -40,7 +40,7 @@ public class UserEntity {
     private boolean deleted;
 
     @Column(columnDefinition = "TINYINT(1)")
-    private boolean emailOtp;
+    private Boolean emailOtp;
 
     @Column
     private String profile; // 프로필이 null일경우 기본사진 설정
