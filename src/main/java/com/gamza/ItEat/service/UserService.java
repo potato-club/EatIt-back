@@ -1,11 +1,13 @@
 package com.gamza.ItEat.service;
 
 import com.gamza.ItEat.dto.user.*;
+import com.gamza.ItEat.entity.TagEntity;
 import com.gamza.ItEat.entity.UserEntity;
 import com.gamza.ItEat.enums.UserRole;
 import com.gamza.ItEat.error.ErrorCode;
 import com.gamza.ItEat.error.exeption.UnAuthorizedException;
 import com.gamza.ItEat.jwt.JwtProvider;
+import com.gamza.ItEat.repository.TagRepository;
 import com.gamza.ItEat.repository.UserRepository;
 import com.gamza.ItEat.service.jwt.RedisService;
 import io.jsonwebtoken.io.IOException;
@@ -17,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.gamza.ItEat.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
 import static com.gamza.ItEat.error.ErrorCode.NOT_FOUND_EXCEPTION;
@@ -27,6 +31,7 @@ import static com.gamza.ItEat.error.ErrorCode.NOT_FOUND_EXCEPTION;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final TagRepository tagRepository;
     private final JwtProvider jwtProvider;
     private final RedisService redisService;
     private final PasswordEncoder passwordEncoder;
@@ -58,13 +63,18 @@ public class UserService {
                 .responseCode("200")
                 .build();
     }
-    public void signUp(SignUpRequestDto requestDto, HttpServletResponse response) {
+    public void signUp(SignUpRequestDto requestDto) {
         if (userRepository.existsByEmail(requestDto.getEmail())) {
             throw new UnAuthorizedException("401", ACCESS_DENIED_EXCEPTION);
         }
-        //카카오 로그인 로직 추후 추가
+
+        Set<TagEntity> tagEntities = requestDto.toTagEntities().stream()
+                .map(tag -> tagRepository.findByTag(tag.getTag())
+                        .orElseGet(() -> tagRepository.save(tag)))
+                .collect(Collectors.toSet());
+
         requestDto.setPassword(passwordEncoder.encode(requestDto.getPassword()));
-        UserEntity userEntity = requestDto.toEntity();
+        UserEntity userEntity = requestDto.toEntity(tagEntities);
         userRepository.save(userEntity);
     }
 

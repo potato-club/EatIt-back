@@ -26,4 +26,7 @@ public class TagEntity {
     @Column(name = "tag_name")
     private TagName tag;
 
+    public TagEntity(TagName tagName) {
+        this.tag = tag;
+    }
 }

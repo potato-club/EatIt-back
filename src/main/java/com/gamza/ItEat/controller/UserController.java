@@ -28,8 +28,8 @@ public class UserController {
 
     @PostMapping("/signup")
     @Operation(summary = "회원가입")
-    public ResponseEntity<String> userSignUp(@RequestBody SignUpRequestDto requestDto, HttpServletResponse response) {
-        userService.signUp(requestDto, response);
+    public ResponseEntity<String> userSignUp(@RequestBody SignUpRequestDto requestDto) {
+        userService.signUp(requestDto);
         return ResponseEntity.ok("회원가입 완료!");
     }
 
