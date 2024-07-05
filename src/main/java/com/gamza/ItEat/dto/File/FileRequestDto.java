@@ -1,16 +1,15 @@
 package com.gamza.ItEat.dto.File;
 
 import com.gamza.ItEat.entity.FileEntity;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 
+
+@Data
+@Builder
+@AllArgsConstructor
 public class FileRequestDto {
     private String fileName;
-    private String fileUrl;
-    private boolean deleted;
-
-    public FileRequestDto(FileEntity file) {
-        this.fileName = file.getFileName();
-        this.fileUrl = file.getFileUrl();
-        this.deleted = true;
-    }
-
+    private boolean isDeleted;
 }
