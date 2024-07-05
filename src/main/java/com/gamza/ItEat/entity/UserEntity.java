@@ -68,6 +68,8 @@ public class UserEntity {
         this.nickName = userUpdateDto.getNickname();
         this.email = userUpdateDto.getEmail();
         this.userRole = userUpdateDto.getUserRole();
+        this.tags = userUpdateDto.toTagEntities();
+
     }
 
     public void setEmailOtp(boolean emailOtp) {
