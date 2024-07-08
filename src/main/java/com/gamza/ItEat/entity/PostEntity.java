@@ -112,5 +112,9 @@ public class PostEntity extends BaseTime {
     public int increaseViews() {
         return this.views += 1;
     }
+    public void addImage(FileEntity image) {
+        images.add(image);
+        image.setPost(this);
+    }
 
 }

@@ -23,6 +23,9 @@ public class FileEntity extends BaseTime {
     @Column(nullable = false)
     private String fileUrl;
 
+    private String storedName;
+
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -31,4 +34,8 @@ public class FileEntity extends BaseTime {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private UserEntity user;
+
+    public void setPost(PostEntity post) {
+        this.post = post;
+    }
 }

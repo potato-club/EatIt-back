@@ -2,12 +2,13 @@ server:
   port: 8081
 spring:
   datasource:
-    url: ENC(ycijG4cGBLkf/ii6OFeyOr4KFYYhOEUlni6QxTOw4crmWwBLTMzvfRHDW/0HiNkw)
-    username: ENC(tJ3Wayb9TrXUsh5F8P0rXA==)
-    password: ENC(JufSsZZ1xe7aGFfBKs1VyHm5eHnoRlqg)
+    url: ENC(z44ecfCHQWJ1LOJYtYvXN1LAptvPipta9CcBBx4ZU6EZHlAor/pAYiA7DO+SOLWC39NcD91JvFYJ2+hXK6sioYToo9u2Use6eKlKAfJQMmST672IHaOPgg==)
+    username: ENC(QKqkg2IetJ69NKczZl90lA==)
+    password: ENC(ckyLlB3q4iXqt8HAzy6/5BRI+3V16Xkj)
     driver-class-name: com.mysql.cj.jdbc.Driver
   data:
     redis:
+      #      host: redis
       host: redis
       port: 6379
   jpa:
@@ -21,15 +22,27 @@ spring:
     open-in-view: false
 
   jwt:
-    secret: ENC(6FSLW23C9EzdXc9nnJlfLJIxbWOD6PY3S8eKTSRsWvq1+xgreWcXGzDXUmeZOI1qn3cHyOjvhl376Idb1ETVbQ3Km5Hg8GjvaLoOyFQs/4tKh411lMQ3YURNYf3iLrSC)
-    accessTokenExpiration: 30000
-    refreshTokenExpiration: 60000
+    secret: ENC(+aRqCgyZ/OYQJcpSI6fVSo5eepNxe9iDnZr56TdsWrn53jXuruExy70ErQd+Ry6uLcX+uRFjRoxQWZMmDHZk2XCZctkPfj4BlMguN0qGZcHtCMFhRkkoQQRvvACt7XF3)
+    accessTokenExpiration: 300000
+    refreshTokenExpiration: 600000
 
 jasypt:
   encryptor:
     bean: jasyptStringEncryptor
 
+cloud:
+  aws:
+    s3:
+      bucket: ENC(m0bqTBTNC6vk8w/90xoxK2ejZ9/55cRWpuUQovjhf5Q=)
+    region:
+      auto: false
+      static: ap-northeast-2
+    credentials:
+      accessKey: ENC(RF//cbj/2OzDVx7s2mMcgF33bl/9opqi3QdJdlOgJEo=)
+      secretKey: ENC(D1JOF7dwKPdQqTj9H/PCxxID/CyD21FKFssst+lf4c7Frl1jDZj54cZk7UGaQ8qVhGZ36XnostY=)
+    stack:
+      auto: false
 email:
   gmail:
-    id: ENC(DR0J+Ify50+A4JkKuXg4HNrWkcgfy4XLwofhJqpir4Y=)
-    pw: ENC(cbu0+ZLXCzeousUvSD8d8hxy93PPRmIWOONbdwKcjfk=)
+    id: ENC(grcUGv0ZhfLq3FvUOsFPvcM0Tpe4gxFWk9nExZcQ8Ek=)
+    pw: ENC(fUUkoxWc+OLQKP8/hsGwW9owcide1oR/2C/uGMdSU6I=)
