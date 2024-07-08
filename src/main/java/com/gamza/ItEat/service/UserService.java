@@ -151,8 +151,11 @@ public class UserService {
         if("refresh".equals(accessTokenType)) {
             throw new UnAuthorizedException("RefreshToken은 사용할 수 없습니다.", ErrorCode.INVALID_TOKEN_EXCEPTION);
         }
+        System.out.println("test");
 
         return token == null ? null : userRepository.findByEmail(jwtProvider.getUserEmail(token));
     }
+
+
 
 }
