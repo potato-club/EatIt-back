@@ -19,7 +19,6 @@ public class SignUpRequestDto {
 
     private String nickName;
     private String email;
-    private UserRole userRole;
     private String password;
     private String tags;
 

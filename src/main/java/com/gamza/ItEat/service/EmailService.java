@@ -33,7 +33,6 @@ public class EmailService {
     @Value("${email.gmail.id}")
     private String gmailUsername;
 
-
     @Autowired
     public EmailService(@Qualifier("gmail") JavaMailSender gmailSender,
                             RedisService redisJwtService,
